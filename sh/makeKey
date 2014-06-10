@@ -1,0 +1,127 @@
+#!/bin/bash
+
+if [ $# -eq 1 ]; then
+	APP_VERSION=$1
+else
+	echo "usage : $0 APP_VERSION"
+	exit 1
+fi
+
+HOME_PATH=`echo \`pwd\` | sed -e 's/\/sh//g'`
+COMMON_PATH=$HOME_PATH/common
+. $COMMON_PATH/base.sh
+
+##############################################
+keyfile="./authkey.png"
+playerfile="./player.swf"
+playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
+AUTH_KEY=`$COMMON_PATH/getParam premium auth_key`
+COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
+AREA_FILE=`$COMMON_PATH/getParam common area_file`
+##############################################
+
+#################################
+# get player
+#################################
+if [ ! -f $playerfile ]; then
+	wget -q -O $playerfile $playerurl
+	if [ $? -ne 0 ]; then
+		ERROR="failed get player"
+		echo "$ERROR"
+		exit 1
+	fi
+fi
+
+#################################
+# get keydata (need swftool)
+#################################
+if [ ! -f $keyfile ]; then
+	BINARY_ID=`swfextract $playerfile | grep Binarys | awk '{print $6}' | awk 'BEGIN{FS="-"}{print $2}'`
+#	BINARY_ID=1
+	swfextract -b $BINARY_ID $playerfile -o $keyfile
+	if [ ! -f $keyfile ]; then
+		ERROR="failed get keydata"
+		echo "$ERROR"
+#		$HOMEPATH/twitter/post.sh "$FILENAME:$channel init miss[$ERROR]. Please see mail."
+		exit 1
+	fi
+fi
+
+#################################
+# access auth1_fms
+#################################
+if [ -f auth1_fms ]; then
+	rm -f auth1_fms
+fi
+wget -q \
+	--header="pragma: no-cache" \
+	--header="X-Radiko-App: pc_1" \
+	--header="X-Radiko-App-Version: $APP_VERSION" \
+	--header="X-Radiko-User: test-stream" \
+	--header="X-Radiko-Device: pc" \
+	--post-data='\r\n' \
+	--save-headers \
+	--no-check-certificate \
+	--load-cookies $COOKIE_FILE \
+	-O auth1_fms \
+	https://radiko.jp/v2/api/auth1_fms
+
+if [ $? -ne 0 ]; then
+	ERROR="failed auth1 process"
+	echo "$ERROR"
+#	$HOMEPATH/twitter/post.sh "$FILENAME:$channel init miss[$ERROR]. Please see mail."
+	exit 1
+fi
+
+#################################
+# get partial key
+#################################
+authtoken=`perl -ne 'print $1 if(/x-radiko-authtoken: ([\w-]+)/i)' auth1_fms`
+offset=`perl -ne 'print $1 if(/x-radiko-keyoffset: (\d+)/i)' auth1_fms`
+length=`perl -ne 'print $1 if(/x-radiko-keylength: (\d+)/i)' auth1_fms`
+partialkey=`dd if=$keyfile bs=1 skip=$offset count=$length 2> /dev/null | base64`
+
+paid_member=0
+if [ -f $AUTH_KEY ]; then
+	paid_member=`cat $AUTH_KEY`
+fi
+echo $authtoken,$partialkey,$paid_member > $AUTH_KEY
+#echo "AUTH_KEY: `cat $AUTH_KEY`"
+#echo -e "authtoken: $authtoken \noffset: $offset \nlength: $length \npartialkey: $partialkey"
+rm -f auth1_fms
+
+#################################
+# access auth2_fms
+#################################
+if [ -f auth2_fms ]; then
+	rm -f auth2_fms
+fi
+wget -q \
+	--header="pragma: no-cache" \
+	--header="X-Radiko-App: pc_1" \
+	--header="X-Radiko-App-Version: $APP_VERSION" \
+	--header="X-Radiko-User: test-stream" \
+	--header="X-Radiko-Device: pc" \
+	--header="X-Radiko-Authtoken: $authtoken" \
+	--header="X-Radiko-Partialkey: $partialkey" \
+	--post-data='\r\n' \
+	--no-check-certificate \
+	--load-cookies $COOKIE_FILE \
+	-O auth2_fms \
+	https://radiko.jp/v2/api/auth2_fms
+
+if [ $? -ne 0 -o ! -f auth2_fms ]; then
+	ERROR="failed auth2 process"
+	echo "$ERROR"
+	exit 1
+fi
+
+#################################
+# get AreaID
+#################################
+areaid=`perl -ne 'print "$1,$2,$3" if(/([^,]+),([^,]+),([^,]+)/i)' auth2_fms`
+echo "$areaid" > $AREA_FILE
+
+rm -rf auth2_fms $keyfile $playerfile 
+echo "authentication success"
+exit 0;

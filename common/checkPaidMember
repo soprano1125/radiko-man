@@ -1,0 +1,49 @@
+#!/usr/bin/perl --
+
+use strict;
+use Config::Simple;
+use File::Spec;
+use JSON;
+
+if (@ARGV != 1){
+	print "usage: " . __FILE__ . " JSON_DATA\n";
+	exit 1;
+}
+
+my $home_path = File::Spec->rel2abs();
+$home_path =~ s/__FILE__//g;
+
+my $cfg;
+
+$cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
+my $auth_key = $home_path .'/'. $cfg->{'premium.auth_key'};
+
+my $JSON = '{' . $ARGV[0] . '}';
+my $item = JSON->new()->decode($JSON);
+
+$item->{status} =~ s/^.*?(\d+).*$/$1/;
+$item->{paid_member} =~ s/^.*?(\d+).*$/$1/;
+$item->{areafree} =~ s/^.*?(\d+).*$/$1/;
+
+my $status = $item->{status};
+my $paid_member = $item->{paid_member};
+my $areafree = $item->{areafree};
+
+my ($message, $auth_status, $ret);
+if ($status == 200) {
+	$message = "logined";
+	$auth_status = ($paid_member << 1) + $areafree;
+	$ret = 0;
+} else {
+	$message = "failed login";
+	$auth_status = 0;
+	$ret = 1;
+}
+
+open(OUT, "> $auth_key");
+print(OUT "$auth_status\n");
+close(OUT);
+
+print "$message";
+exit $ret;
+

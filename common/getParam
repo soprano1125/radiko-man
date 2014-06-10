@@ -1,0 +1,26 @@
+#!/usr/bin/perl --
+
+use strict;
+use Config::Simple;
+use File::Spec;
+
+if (@ARGV != 2){
+	print "usage: " . __FILE__ . " section param_name\n";
+	exit 1;
+}
+
+
+my ($res, $ua, $cfg);
+
+my $home_path = File::Spec->rel2abs();
+$home_path =~ s/__FILE__//g;
+
+my $section = $ARGV[0];
+my $param_name = $ARGV[1];
+
+
+$cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
+
+print $cfg->{$section . '.' . $param_name} . "\n";
+exit 0;
+

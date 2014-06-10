@@ -1,0 +1,8 @@
+#!/usr/local/perl/bin/perl --
+use Config::Simple;
+use Data::Dumper;
+use Encode;
+use JSON;
+use LWP::UserAgent;
+use XML::Simple;
+use strict;

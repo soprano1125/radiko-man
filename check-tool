@@ -1,0 +1,9 @@
+#!/bin/bash
+
+which rtmpdump
+which swfextract
+which ffmpeg
+which vlc
+which sudo 
+which wget
+which base64

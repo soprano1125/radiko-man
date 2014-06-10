@@ -1,0 +1,66 @@
+#!/bin/bash
+
+if [ $# -eq 2 ]; then
+	station_id=$1;
+	isPremium=$2;
+
+else
+	echo "usage : $0 station_id isPremium<0,1>"
+	exit 1
+fi
+
+HOME_PATH=`echo \`pwd\` | sed -e 's/\/sh//g'`
+COMMON_PATH=$HOME_PATH/common
+. $COMMON_PATH/base.sh
+
+AUTH_KEY=`$COMMON_PATH/getParam premium auth_key`
+COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
+AREA_FILE=`$COMMON_PATH/getParam common area_file`
+API_URL=`$COMMON_PATH/getParam common.api_url`
+
+SERVER=`$COMMON_PATH/getParam common server`
+PLAYPATH=`$COMMON_PATH/getParam common play_path`
+APPLICATION="${channel}/`$COMMON_PATH/getParam common application`"
+APP_VERSION=`$COMMON_PATH/getParam common player_ver`
+playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
+
+TEXT=`cat $AUTH_KEY`; IFS=','
+set -- $TEXT
+authtoken=$1
+partialkey=$2
+paid_member=$3
+if [ "$paid_member" == "" ]; then
+	paid_member=0
+fi
+
+if [ $paid_member -eq 3 -a $isPremium -eq 0 ]; then
+##################################
+# Premium 
+##################################
+	area_id="premium";
+	area_name=$area_id;
+
+	wget -q -O $station_id_program.xml $API_URL/program/station/today?station_id=$station_id
+	if [ $? -ne 0 ]; then
+		status="Station is Found."
+		ret=0
+	else
+		status="Station is not Found."
+		ret=1
+	fi
+	message="$area_name|$status($area_id)";
+
+else
+##################################
+# not Premium 
+##################################
+	area_id=`perl -ne 'print $1 if(/^([^,]+),([^,]+),([^,]+)/i)' $AREA_FILE`
+	rm -rf $AREA_FILE
+
+	message=`common/checkIPArea $area_id $station_id`
+	ret=$?
+fi
+
+echo $message
+exit $ret
+

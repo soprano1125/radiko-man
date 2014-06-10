@@ -1,0 +1,50 @@
+#!/usr/bin/perl --
+
+#
+#
+#
+
+use strict;
+use LWP::UserAgent;
+use XML::Simple;
+
+if (@ARGV != 2){
+	print "usage: " . __FILE__ . " area_id station_id\n";
+	exit 1;
+}
+
+my $area_id = $ARGV[0];
+my $station_id = $ARGV[1];
+my $ua = LWP::UserAgent->new;
+
+$ua->timeout(10);
+$ua->agent('Mozilla/5.0 (radioman/0.1)');
+my $req = HTTP::Request->new(GET => 'http://radiko.jp/v2/station/list/' . $area_id . '.xml');
+my $res = $ua->request($req);
+
+if (!$res->is_success) {
+	print "Station is not Found. But, please look at the state because it might be all right in the area determined.|Unknown\n";
+	exit 0;
+}
+
+my $xml = XML::Simple->new(keyattr => []);
+my $data = $xml->XMLin($res->content);
+
+my ($channel, $station, $status, $ret);
+foreach $station (@{$data->{'station'}}){
+	$channel = $station->{'id'};
+	if($channel eq $station_id){
+		last;
+	}
+}
+if($channel eq $station_id){
+	$status = "Station is Found.";
+	$ret = 0;
+} else {
+	$status = "Station is not Found.";
+	$ret = 1;
+}
+
+print "$data->{'area_name'}|$status($area_id)";
+exit $ret;
+

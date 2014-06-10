@@ -1,0 +1,22 @@
+#!/usr/bin/perl --
+
+use strict;
+use Config::Simple;
+use File::Spec;
+use LWP::UserAgent;
+
+my ($ua, $cfg);
+
+my $home_path = File::Spec->rel2abs();
+$home_path =~ s/__FILE__//g;
+
+$cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
+my $url = $cfg->{'premium.auth_url'};
+my $auth_key = $home_path .'/'. $cfg->{'premium.auth_key'};
+my $cookie_file = $home_path .'/'. $cfg->{'premium.cookie_file'};
+
+$ua = LWP::UserAgent->new;
+$ua->cookie_jar({file => $cookie_file, autosave => 1});
+$ua->get($url . '/webapi/member/logout');
+print "logouted.\n";
+exit 0;

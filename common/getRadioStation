@@ -1,0 +1,33 @@
+#!/usr/bin/perl --
+
+use strict;
+use Config::Simple;
+use LWP::UserAgent;
+use XML::Simple;
+use Data::Dumper;
+use Encode;
+
+if (@ARGV != 1){
+	print "usage: " . __FILE__ . " station_id\n";
+	exit 1;
+}
+
+my ($ua, $res, $cfg, $data);
+
+$cfg = new Config::Simple('./radiko.ini')->vars();
+my $api_url = $cfg->{'common.api_url'};
+
+my $station_id = $ARGV[0];
+
+$ua = LWP::UserAgent->new;
+
+$res = $ua->get($api_url . '/program/station/today?station_id=' . $station_id);
+if (!$res->is_success) {
+	print "Station is not Found.\n";
+	exit 1;
+}
+
+$data = XML::Simple->new(keyattr => [])->XMLin($res->content);
+print encode('utf-8', $data->{"stations"}->{"station"}->{"name"} . "\n");
+exit 0;
+

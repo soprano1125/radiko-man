@@ -1,0 +1,57 @@
+#!/bin/bash
+
+
+HOME_PATH=`echo \`pwd\` | sed -e 's/\/sh//g'`
+COMMON_PATH=$HOME_PATH/common
+. $COMMON_PATH/base.sh
+
+##############################################
+checkfile="./check.txt"
+url=`$COMMON_PATH/getParam premium auth_url`
+COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
+mail=`$COMMON_PATH/getParam premium auth_mail`
+pass=`$COMMON_PATH/getParam premium auth_pass`
+##############################################
+
+####################################
+# Logout Function -> sh/login
+####################################
+#################################
+# Login
+#################################
+wget -q \
+	--post-data="mail=$mail&pass=$pass" \
+	--keep-session-cookies \
+	--save-cookie=$COOKIE_FILE \
+	-O /dev/null \
+	$url/login/login
+
+if [ ! -f $COOKIE_FILE ]; then
+	echo "failed login.:[$mail]"
+	exit 1
+fi
+
+#################################
+# check login
+#################################
+wget -q \
+	--no-check-certificate \
+	--load-cookies $COOKIE_FILE \
+	-O $checkfile \
+	$url/webapi/member/login/check
+
+if [ $? -ne 0 ]; then
+	echo "failed login.:[$mail]"
+	rm -rf $checkfile
+	exit 1
+fi
+
+#################################
+# paid member
+#################################
+JSON=`perl -ne 'print $1 if(/\{(.*)\}/i)' $checkfile`
+echo `common/checkPaidMember $JSON`".:[$mail]"
+ret=$?
+isPremium=$ret
+rm -rf $checkfile
+

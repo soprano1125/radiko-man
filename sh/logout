@@ -1,0 +1,27 @@
+#!/bin/bash
+
+HOME_PATH=`echo \`pwd\` | sed -e 's/\/sh//g'`
+COMMON_PATH=$HOME_PATH/common
+. $COMMON_PATH/base.sh
+
+##############################################
+url=`$COMMON_PATH/getParam premium auth_url`
+COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
+##############################################
+
+####################################
+# Logout Function -> sh/logout
+####################################
+wget -q \
+	--no-check-certificate \
+	--load-cookies $COOKIE_FILE \
+	--save-headers \
+	-O /dev/null \
+	$url/webapi/member/logout
+
+if [ -f $COOKIE_FILE ]; then
+	rm -f $COOKIE_FILE
+fi
+echo "logouted."
+
+
