@@ -131,6 +131,6 @@ close(OUT);
 
 unlink($keyfile, $player_file);
 
-print "authentication success";
+print "authentication success.\n";
 exit 0;
 

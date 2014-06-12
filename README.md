@@ -34,7 +34,8 @@ radiko.jp 録音スクリプト。
    * rtmpdump
    * swftools
    * sudo(管理者権限でないとファイルを保管できない場合)
-   * ffmpeg(mp3エンコードする場合は必須)
+   * ffmpeg(mp3 エンコードする場合は必須)
+      * libavcodec-extra-53(mp3 エンコードする場合は必須)
    * vlc(聴取のみの場合は必須)
 * Perl パッケージ
    * Config::Simple;

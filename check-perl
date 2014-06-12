@@ -1,4 +1,4 @@
-#!/usr/local/perl/bin/perl --
+#!/usr/bin/perl --
 use Config::Simple;
 use Data::Dumper;
 use Encode;

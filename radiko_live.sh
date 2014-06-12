@@ -15,11 +15,13 @@ else
 	exit 1
 fi
 
-HOME_PATH=/home/ubuntu/radiko2
+HOME_PATH=/home/ubuntu/radiko-man
 PROG_PATH=$HOME_PATH
 COMMON_PATH=$PROG_PATH/common
 
 . $COMMON_PATH/base.sh
+cd $PROG_PATH
+
 PROG_MODE=`$COMMON_PATH/getParam common prog_mode`
 MODULE_PATH=$PROG_PATH/$PROG_MODE
 

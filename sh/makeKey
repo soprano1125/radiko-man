@@ -10,10 +10,11 @@ fi
 HOME_PATH=`echo \`pwd\` | sed -e 's/\/sh//g'`
 COMMON_PATH=$HOME_PATH/common
 . $COMMON_PATH/base.sh
+echo $HOME_PATH 1>&2
 
 ##############################################
-keyfile="./authkey.png"
-playerfile="./player.swf"
+keyfile="$HOME_PATH/authkey.png"
+playerfile="$HOME_PATH/player.swf"
 playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
 AUTH_KEY=`$COMMON_PATH/getParam premium auth_key`
 COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
