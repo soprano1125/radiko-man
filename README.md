@@ -39,7 +39,8 @@ radiko.jp 録音スクリプト。
    * vlc(聴取のみの場合は必須)
 * Perl パッケージ
    * Config::Simple;
-   * Data::Dumper;
+   * File::Spec;
+   * Unicode::Japanese;
    * Encode;
    * JSON;
    * LWP::UserAgent;
