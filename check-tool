@@ -1,9 +1,35 @@
 #!/bin/bash
 
-which rtmpdump
-which swfextract
-which ffmpeg
-which vlc
-which sudo 
-which wget
-which base64
+echo "Let's check installed packages."
+RET_MESSAGE=`which rtmpdump`
+if [ $? -eq 1 ]; then echo "Not install 'rtmpdump' package."; fi
+RET_MESSAGE=`which swfextract`
+if [ $? -eq 1 ]; then echo "Not install 'swftools' package."; fi
+RET_MESSAGE=`which ffmpeg`
+if [ $? -eq 1 ]; then echo "Not install 'ffmpeg' package(need mp3-module)."; fi
+RET_MESSAGE=`which vlc`
+if [ $? -eq 1 ]; then echo "Not install 'vlc' package."; fi
+RET_MESSAGE=`which sudo`
+if [ $? -eq 1 ]; then echo "Not install 'sudo' package."; fi
+RET_MESSAGE=`which wget`
+if [ $? -eq 1 ]; then echo "Not install 'wget' package."; fi
+RET_MESSAGE=`which base64`
+if [ $? -eq 1 ]; then echo "Not install 'base64' package."; fi
+RET_MESSAGE=`which perldoc && perldoc -m strict 2>&1 > /dev/null`
+if [ $? -eq 1 ]; then echo "Not install 'perl-doc' package."; exit 1; fi
+
+echo ""
+echo "Let's check installed perl modules."
+RET_MESSAGE=`perldoc -m Config::Simple 2>&1 > /dev/null`
+if [ $? -eq 1 ]; then echo "Not install 'Config::Simple' module."; fi
+RET_MESSAGE=`perldoc -m Encode 2>&1 > /dev/null`
+if [ $? -eq 1 ]; then echo "Not install 'Encode' module."; fi
+RET_MESSAGE=`perldoc -m File::Spec 2>&1 > /dev/null`
+if [ $? -eq 1 ]; then echo "Not install 'File::Spec' module."; fi
+RET_MESSAGE=`perldoc -m JSON 2>&1 > /dev/null`
+if [ $? -eq 1 ]; then echo "Not install 'JSON' module."; fi
+RET_MESSAGE=`perldoc -m LWP::UserAgent 2>&1 > /dev/null`
+if [ $? -eq 1 ]; then echo "Not install 'LWP::UserAgent' module."; fi
+RET_MESSAGE=`perldoc -m XML::Simple 2>&1 > /dev/null`
+if [ $? -eq 1 ]; then echo "Not install 'XML::Simple' module."; fi
+
