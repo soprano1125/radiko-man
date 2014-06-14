@@ -10,7 +10,6 @@ fi
 HOME_PATH=`echo \`pwd\` | sed -e 's/\/sh//g'`
 COMMON_PATH=$HOME_PATH/common
 . $COMMON_PATH/base.sh
-echo $HOME_PATH 1>&2
 
 ##############################################
 keyfile="$HOME_PATH/authkey.png"

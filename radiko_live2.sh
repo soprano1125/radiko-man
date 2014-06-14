@@ -16,6 +16,7 @@ else
 fi
 
 HOME_PATH=/home/ubuntu/radiko-man
+PROG_PATH=$HOME_PATH
 COMMON_PATH=$PROG_PATH/common
 
 . $COMMON_PATH/base.sh
@@ -53,8 +54,11 @@ if [ $? -ne 0 ]; then
 	exit 1;
 fi
 
-if [ $isPremium -ne 1 ]; then
+if [ $isPremium -ne 1 ];
+then
 	$MODULE_PATH/logout
+else
+	sleep 1
 fi
 
 TEXT=`cat $AUTH_KEY`; IFS=','
@@ -66,6 +70,6 @@ rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 #
 # rtmpdump
 #
-rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:"$authtoken" --timeout $time --live --flv - 2> /dev/null | cvlc --verbose=2 --syslog --file-logging --logfile=vlc-log.txt --no-one-instance -I dummy - 2> /dev/null
+rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:"$authtoken" --timeout $time --live --flv - 2> /dev/null | cvlc --meta-title $channel --no-one-instance -I dummy - 
 exit 0
 

@@ -1,6 +1,6 @@
 # radiko-man
 ## 概要
-radiko.jp 録音スクリプト。
+radiko.jp 聴取/録音スクリプト。
 
 ## ファイル内容
     + radiko-man
@@ -47,7 +47,7 @@ radiko.jp 録音スクリプト。
    * XML::Simple;
 
 ## 使い方
-1. check-perl, check-tool をそれぞれ実行してエラーが出力されないことを確認する
+1. check-tool をそれぞれ実行してエラーが出力されないことを確認する
 1. radiko.ini の｢auth_mail｣､｢auth_pass｣を自分の環境に合わせて設定する｡
 1. radiko-man/*.sh に記載している HOME_PATH, PROG_PATH, TEMP_PATH, OUT_DIR を環境に応じて設定する｡
 1. 使用する radiko-man/*.sh の動作確認を行う｡
@@ -87,4 +87,5 @@ $ ./radiko_live.sh channel_name buffer_time premium_mode<free,premium>
 + [radiko.jp](http://www.radiko.jp)
 + [簡易radiko録音ツール。要swftools](https://gist.github.com/saiten/875864)
     + [KOYAMA Yoshiaki のブログ](http://kyoshiaki.hatenablog.com/entry/2014/05/04/184748 "簡易 radiko.jp プレミアム対応 Radiko 録音スクリプト rec_radiko2.sh 公開。")
++ [radiko 参加放送局一覧](http://www.dcc-jpl.com/foltia/wiki/radikomemo "radikomemo - foltia - Trac")
 

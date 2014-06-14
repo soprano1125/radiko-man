@@ -54,8 +54,11 @@ if [ $? -ne 0 ]; then
 	exit 1;
 fi
 
-if [ $isPremium -ne 1 ]; then
+if [ $isPremium -ne 1 ];
+then
 	$MODULE_PATH/logout
+else
+	sleep 1
 fi
 
 TEXT=`cat $AUTH_KEY`; IFS=','
