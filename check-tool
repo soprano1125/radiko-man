@@ -32,4 +32,8 @@ RET_MESSAGE=`perldoc -m LWP::UserAgent 2>&1 > /dev/null`
 if [ $? -eq 1 ]; then echo "Not install 'LWP::UserAgent' module."; fi
 RET_MESSAGE=`perldoc -m XML::Simple 2>&1 > /dev/null`
 if [ $? -eq 1 ]; then echo "Not install 'XML::Simple' module."; fi
+RET_MESSAGE=`perldoc -m Encode 2>&1 > /dev/null`
+if [ $? -eq 1 ]; then echo "Not install 'Encode' module."; fi
+RET_MESSAGE=`perldoc -m Unicode::Japanese 2>&1 > /dev/null`
+if [ $? -eq 1 ]; then echo "Not install 'Unicode::Japanese' module."; fi
 

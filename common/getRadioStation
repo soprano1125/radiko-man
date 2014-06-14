@@ -2,10 +2,11 @@
 
 use strict;
 use Config::Simple;
+use File::Spec;
 use LWP::UserAgent;
 use XML::Simple;
-use Data::Dumper;
 use Encode;
+use Unicode::Japanese;
 
 if (@ARGV != 1){
 	print "usage: " . __FILE__ . " station_id\n";
@@ -14,7 +15,10 @@ if (@ARGV != 1){
 
 my ($ua, $res, $cfg, $data);
 
-$cfg = new Config::Simple('./radiko.ini')->vars();
+my $home_path = File::Spec->rel2abs();
+$home_path =~ s/__FILE__//g;
+
+$cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
 my $api_url = $cfg->{'common.api_url'};
 
 my $station_id = $ARGV[0];
@@ -28,6 +32,10 @@ if (!$res->is_success) {
 }
 
 $data = XML::Simple->new(keyattr => [])->XMLin($res->content);
-print encode('utf-8', $data->{"stations"}->{"station"}->{"name"} . "\n");
+my $station_name = encode('utf-8', $data->{"stations"}->{"station"}->{"name"} . "\n");
+$station_name = Unicode::Japanese->new($station_name)->z2h->get;
+$station_name = Unicode::Japanese->new($station_name)->h2zKana->get;
+print "$station_name";
 exit 0;
+
 
