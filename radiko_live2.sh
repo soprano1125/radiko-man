@@ -11,7 +11,7 @@ elif [ $# -eq 3 ]; then
 	flgPremium=$3
 
 else
-	echo "usage : $0 channel_name buffer_time premium_mode<free,premium>"
+	echo "usage : $0 channel_name buffer_time {premium_mode<free,premium>}"
 	exit 1
 fi
 
@@ -53,6 +53,7 @@ if [ $? -ne 0 ]; then
 	rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 	exit 1;
 fi
+STATION_NAME=`$COMMON_PATH/getRadioStation $channel`
 
 if [ $isPremium -ne 1 ];
 then
@@ -70,6 +71,6 @@ rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 #
 # rtmpdump
 #
-rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:"$authtoken" --timeout $time --live --flv - 2> /dev/null | cvlc --meta-title $channel --no-one-instance -I dummy - 
+rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:"$authtoken" --timeout $time --live --flv - 2> /dev/null | cvlc --meta-title $STATION_NAME --no-one-instance -I dummy - 
 exit 0
 

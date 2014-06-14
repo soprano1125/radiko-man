@@ -34,10 +34,12 @@ AUTH_KEY=`$COMMON_PATH/getParam premium auth_key`
 COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
 AREA_FILE=`$COMMON_PATH/getParam common area_file`
 
+AUTHOR="radiko.jp"
 isPremium=1
 if [ "$flgPremium" = "premium" ]; then
 	$MODULE_PATH/login
 	isPremium=$?
+	AUTHOR="radiko.jp premium"
 fi
 
 $MODULE_PATH/makeKey $APP_VERSION
@@ -53,6 +55,7 @@ if [ $? -ne 0 ]; then
 	rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 	exit 1;
 fi
+STATION_NAME=`$COMMON_PATH/getRadioStation $channel`
 
 if [ $isPremium -ne 1 ];
 then
@@ -70,6 +73,6 @@ rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 #
 # rtmpdump
 #
-rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:"$authtoken" --timeout $time --live --flv - 2> /dev/null | vlc - 2> /dev/null
+rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:"$authtoken" --timeout $time --live --flv - 2> /dev/null | vlc --meta-title " " --meta-author $AUTHOR --meta-artist $STATION_NAME --meta-date $REC_DATE --play-and-exit --no-one-instance - 2> /dev/null
 exit 0
 
