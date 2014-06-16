@@ -16,13 +16,7 @@ COMMON_PATH=$HOME_PATH/common
 AUTH_KEY=`$COMMON_PATH/getParam premium auth_key`
 COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
 AREA_FILE=`$COMMON_PATH/getParam common area_file`
-API_URL=`$COMMON_PATH/getParam common.api_url`
-
-SERVER=`$COMMON_PATH/getParam common server`
-PLAYPATH=`$COMMON_PATH/getParam common play_path`
-APPLICATION="${channel}/`$COMMON_PATH/getParam common application`"
-APP_VERSION=`$COMMON_PATH/getParam common player_ver`
-playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
+API_URL=`$COMMON_PATH/getParam common api_url`
 
 TEXT=`cat $AUTH_KEY`; IFS=','
 set -- $TEXT
@@ -41,7 +35,7 @@ if [ $paid_member -eq 3 -a $isPremium -eq 0 ]; then
 	area_name=$area_id;
 
 	wget -q -O $station_id-program.xml $API_URL/program/station/today?station_id=$station_id
-	if [ $? -ne 0 ]; then
+	if [ $? -eq 0 -a -s $station_id-program.xml ]; then
 		status="Station is Found."
 		ret=0
 	else

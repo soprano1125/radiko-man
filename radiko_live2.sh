@@ -25,9 +25,6 @@ cd $PROG_PATH
 PROG_MODE=`$COMMON_PATH/getParam common prog_mode`
 MODULE_PATH=$PROG_PATH/$PROG_MODE
 
-SERVER=`$COMMON_PATH/getParam common server`
-PLAYPATH=`$COMMON_PATH/getParam common play_path`
-APPLICATION="${channel}/`$COMMON_PATH/getParam common application`"
 APP_VERSION=`$COMMON_PATH/getParam common player_ver`
 playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
 AUTH_KEY=`$COMMON_PATH/getParam premium auth_key`
@@ -62,11 +59,19 @@ else
 	sleep 1
 fi
 
-TEXT=`cat $AUTH_KEY`; IFS=','
+IFS=','
+
+TEXT=`cat $AUTH_KEY`
 set -- $TEXT
 authtoken=$1
 echo $authtoken
 rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
+
+TEXT=`$COMMON_PATH/getStreamParam ${channel}`
+set -- $TEXT
+SERVER=$1
+APPLICATION=$2
+PLAYPATH=$3
 
 #
 # rtmpdump
