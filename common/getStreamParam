@@ -1,0 +1,40 @@
+#!/usr/bin/perl --
+
+use strict;
+use Config::Simple;
+use File::Spec;
+use LWP::UserAgent;
+use XML::Simple;
+
+if (@ARGV != 1){
+	print "usage: " . __FILE__ . " station_id\n";
+	exit 1;
+}
+
+my ($ua, $res, $cfg, $data);
+
+my $station_id = $ARGV[0];
+
+my $home_path = File::Spec->rel2abs();
+$home_path =~ s/__FILE__//g;
+
+$cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
+my $rtmp_pattern = $cfg->{'common.rtmp_pattern'};
+
+$ua = LWP::UserAgent->new;
+
+$res = $ua->get("http://radiko.jp/v2/station/stream/$station_id.xml");
+if (!$res->is_success) {
+	print "Station is not Found.\n";
+	exit 1;
+}
+
+my $stream_url = XML::Simple->new(keyattr => [])->XMLin($res->content)->{"item"}[0];
+# rtmpe://w-radiko.smartstream.ne.jp/FMJ/_definst_/simul-stream.stream
+
+my ($blank, $protocol, $server, $application, $playpath) = split($rtmp_pattern, $stream_url);
+print "$protocol://$server,$application,$playpath\n";
+
+exit 0;
+
+
