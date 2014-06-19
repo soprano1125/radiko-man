@@ -9,15 +9,15 @@ COMMON_PATH=$HOME_PATH/common
 checkfile="./check.txt"
 url=`$COMMON_PATH/getParam premium auth_url`
 COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
-mail=`$COMMON_PATH/getParam premium auth_mail`
-pass=`$COMMON_PATH/getParam premium auth_pass`
+auth_mail=`$COMMON_PATH/getParam premium auth_mail`
+auth_pass=`$COMMON_PATH/getParam premium auth_pass`
 ##############################################
 
 ####################################
 # Login
 ####################################
 wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
-	--post-data="mail=$mail&pass=$pass" \
+	--post-data="mail=$auth_mail&pass=$auth_pass" \
 	--keep-session-cookies \
 	--save-cookie=$COOKIE_FILE \
 	-O /dev/null \
