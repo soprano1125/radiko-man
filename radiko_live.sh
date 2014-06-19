@@ -1,17 +1,15 @@
 #/bin/sh
 
 
-if [ $# -eq 2 ]; then
+if [ $# -eq 1 ]; then
 	channel=$1
-	time=$2
 
-elif [ $# -eq 3 ]; then
+elif [ $# -eq 2 ]; then
 	channel=$1
-	time=$2
 	flgPremium=$3
 
 else
-	echo "usage : $0 channel_name buffer_time premium_mode<free,premium>"
+	echo "usage : $0 channel_name [premium_mode<free,premium>]"
 	exit 1
 fi
 

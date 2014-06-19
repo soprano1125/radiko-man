@@ -57,14 +57,13 @@ radiko.jp 聴取/録音スクリプト。
 ```
 $ ./radiko_noenc.sh channel_name rec_time premium_mode<free,premium> [outputfile]
 $ ./radiko_mp3.sh channel_name rec_time premium_mode<free,premium> [outputfile]
-$ ./radiko_live.sh channel_name buffer_time premium_mode<free,premium>
+$ ./radiko_live.sh channel_name [premium_mode<free,premium>]
 ```
 
 ## 引数の解説
 + radiko_mp3.sh, radiko_noenc.sh, radiko_live.sh
    + `channel_name` : 録音する放送局の ID
    + `rec_time` : 録音時間(秒)
-   + `buffer_time` : バッファ時間(秒)
    + `premium_mode` : プレミアム会員で録音する場合は premium, そうでない場合は free
    + `outputfile` : (あれば)番組名
 + radiko.ini
