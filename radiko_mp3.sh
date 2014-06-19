@@ -31,7 +31,7 @@ OUT_FILE=$OUT_DIR/$FILENAME.mp3
 FILE_OWNER=`$COMMON_PATH/getParam common owner`
 
 mkdir -p $OUT_DIR $TEMP_PATH $PROG_PATH/log/
-$PROG_PATH/radiko_download.sh $channel $time $flgPremium $TEMP_PATH/$FILENAME.flv $PROG_MODE
+$PROG_PATH/radiko_download.sh $channel $time $flgPremium $TEMP_PATH/$FILENAME.flv
 if [ $? -ne 0 ]; then
 	exit 1;
 fi
@@ -58,6 +58,6 @@ else
 fi
 
 #$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
-echo "$MESSAGE"
+echo "$MESSAGE" 1>&2
 exit $FFMPEG_STATUS
 

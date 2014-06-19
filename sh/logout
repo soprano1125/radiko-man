@@ -22,6 +22,6 @@ wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 if [ -f $COOKIE_FILE ]; then
 	rm -f $COOKIE_FILE
 fi
-echo "logouted."
+echo -n "logouted."
 
 

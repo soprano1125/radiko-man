@@ -56,6 +56,6 @@ else
 	ret=$?
 fi
 
-echo $message
+echo -n $message
 exit $ret
 

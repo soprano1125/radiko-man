@@ -21,6 +21,7 @@ AREA_FILE=`$COMMON_PATH/getParam common area_file`
 API_URL=`$COMMON_PATH/getParam common api_url`
 ##############################################
 
+
 #################################
 # get player
 #################################
@@ -29,7 +30,8 @@ if [ ! -f $playerfile ]; then
 	if [ $? -ne 0 ]; then
 		rm -rf $playerfile
 		ERROR="failed get player"
-		echo "$ERROR"
+		echo -n "$ERROR"
+#		$HOMEPATH/twitter/post.sh "$FILENAME:$channel init miss[$ERROR]. Please see mail."
 		exit 1
 	fi
 fi
@@ -44,7 +46,7 @@ if [ ! -f $keyfile ]; then
 	if [ ! -f $keyfile ]; then
 		rm -rf $playerfile $keyfile
 		ERROR="failed get keydata"
-		echo "$ERROR"
+		echo -n "$ERROR"
 #		$HOMEPATH/twitter/post.sh "$FILENAME:$channel init miss[$ERROR]. Please see mail."
 		exit 1
 	fi
@@ -72,7 +74,7 @@ wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 if [ $? -ne 0 ]; then
 	rm -rf $playerfile $keyfile auth1_fms
 	ERROR="failed auth1 process"
-	echo "$ERROR"
+	echo -n "$ERROR"
 #	$HOMEPATH/twitter/post.sh "$FILENAME:$channel init miss[$ERROR]. Please see mail."
 	exit 1
 fi
@@ -117,7 +119,7 @@ wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 if [ $? -ne 0 -o ! -f auth2_fms ]; then
 	rm -rf $playerfile $keyfile auth1_fms auth2_fms
 	ERROR="failed auth2 process"
-	echo "$ERROR"
+	echo -n "$ERROR"
 	exit 1
 fi
 
@@ -128,6 +130,6 @@ areaid=`perl -ne 'print "$1,$2,$3" if(/([^,]+),([^,]+),([^,]+)/i)' auth2_fms`
 echo "$areaid" > $AREA_FILE
 
 rm -rf auth2_fms $keyfile $playerfile 
-echo "authentication success"
+echo -n "authentication success"
 exit 0;
 

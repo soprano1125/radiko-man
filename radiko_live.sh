@@ -22,62 +22,12 @@ COMMON_PATH=$PROG_PATH/common
 . $COMMON_PATH/base.sh
 cd $PROG_PATH
 
-PROG_MODE=`$COMMON_PATH/getParam common prog_mode`
-MODULE_PATH=$PROG_PATH/$PROG_MODE
-
-APP_VERSION=`$COMMON_PATH/getParam common player_ver`
-playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
-AUTH_KEY=`$COMMON_PATH/getParam premium auth_key`
-COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
-AREA_FILE=`$COMMON_PATH/getParam common area_file`
-
 AUTHOR="radiko.jp"
-isPremium=1
-if [ "$flgPremium" = "premium" ]; then
-	$MODULE_PATH/login
-	isPremium=$?
-	AUTHOR="radiko.jp premium"
-fi
-
-$MODULE_PATH/makeKey $APP_VERSION
-if [ $? -ne 0 ]; then
-	if [ $isPremium -ne 1 ]; then $MODULE_PATH/logout; fi
-	rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
-	exit 1;
-fi
-
-$MODULE_PATH/checkArea $channel $isPremium
-if [ $? -ne 0 ]; then
-	if [ $isPremium -ne 1 ]; then $MODULE_PATH/logout; fi
-	rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
-	exit 1;
-fi
 STATION_NAME=`$COMMON_PATH/getRadioStation $channel`
-
-if [ $isPremium -ne 1 ];
-then
-	$MODULE_PATH/logout
-else
-	sleep 1
-fi
-
-IFS=','
-
-TEXT=`cat $AUTH_KEY`
-set -- $TEXT
-authtoken=$1
-echo $authtoken
-rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
-
-TEXT=`$COMMON_PATH/getStreamParam ${channel}`
-set -- $TEXT
-SERVER=$1
-APPLICATION=$2
-PLAYPATH=$3
 
 #
 # rtmpdump
 #
-rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:"$authtoken" --timeout $time --live --flv - 2> /dev/null | vlc --meta-title " " --meta-author $AUTHOR --meta-artist $STATION_NAME --meta-date $REC_DATE --play-and-exit --no-one-instance - 2> /dev/null
+$PROG_PATH/radiko_download.sh $channel live $flgPremium live-$REC_DATE | vlc --meta-title " " --meta-author $AUTHOR --meta-artist $STATION_NAME --meta-date $REC_DATE --play-and-exit --no-one-instance - 2> /dev/null
 exit 0
 

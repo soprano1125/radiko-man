@@ -74,8 +74,11 @@ if (($paid_member == 3) && !$isPremium) {
 
 	$message = `common/checkIPArea $area_id $station_id`;
 	$ret = $?;
+	if ($ret) {
+		$ret = 1;
+	}
 }
 
-print "$message\n";
-exit $ret;
+print "$message";
+exit "$ret";
 

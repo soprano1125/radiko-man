@@ -23,7 +23,7 @@ $ua->agent($user_agent);
 $ua->cookie_jar({file => $cookie_file, autosave => 1});
 
 $ua->get($url . '/webapi/member/logout');
-print "logouted.\n";
+print "logouted.";
 
 exit 0;
 

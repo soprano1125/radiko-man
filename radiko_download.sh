@@ -31,39 +31,52 @@ AREA_FILE=`$COMMON_PATH/getParam common area_file`
 
 FILE_NAME=`echo $DUMP_FILE | sed -e "s|$TEMP_PATH\/||g"`
 
+isLive=`echo FILE_NAME | perl -ne 'print $1 if(/^(\w+)-(\d+)/i)'`
+if [ "$time" = "live" ]; then
+	time=""
+	isLive="live"
+	DUMP_FILE="-"
+	DISP_MODE="/dev/null"
+else
+	time="-B $time"
+	isLive="rec"
+fi
+
 isPremium="FreeMode"
 isPremiumRet=1
 if [ "$flgPremium" = "premium" ]; then
-	$MODULE_PATH/login
+	MESSAGE=`$MODULE_PATH/login`
 	isPremiumRet=$?
+	echo $MESSAGE 1>&2
 	isPremium="PremiumMode"
 fi
 
 MESSAGE=`$MODULE_PATH/makeKey $APP_VERSION`
 if [ $? -ne 0 ]; then
-	if [ $isPremiumRet -ne 1 ]; then $MODULE_PATH/logout; fi
-	MESSAGE="$FILE_NAME:$channel rec miss[$MESSAGE][$isPremium]"
+	if [ $isPremiumRet -ne 1 ]; then MESSAGE_DUMMY=`$MODULE_PATH/logout`; isPremium="$isPremium->FreeMode"; fi
+	MESSAGE="$FILE_NAME:$channel $isLive miss[$MESSAGE][$isPremium]"
+	echo $MESSAGE 1>&2
 #	$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
-	echo $MESSAGE
 	rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 	exit 1;
 fi
-echo $MESSAGE
+echo $MESSAGE 1>&2
 
 MESSAGE=`$MODULE_PATH/checkArea $channel $isPremiumRet`
 if [ $? -ne 0 ]; then
-	if [ $isPremiumRet -ne 1 ]; then $MODULE_PATH/logout; fi
+	if [ $isPremiumRet -ne 1 ]; then MESSAGE_DUMMY=`$MODULE_PATH/logout`; isPremium="$isPremium->FreeMode"; fi
 	MESSAGE=`echo $MESSAGE | cut -d '|' -f 2` 
-	MESSAGE="$FILE_NAME:$channel rec miss[$MESSAGE][$isPremium]"
+	MESSAGE="$FILE_NAME:$channel $isLive miss[$MESSAGE][$isPremium]"
+	echo $MESSAGE 1>&2
 #	$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
-	echo $MESSAGE
 	rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 	exit 1;
 fi
-echo $MESSAGE
+echo $MESSAGE 1>&2
 
 if [ $isPremiumRet -ne 1 ]; then
-	$MODULE_PATH/logout
+	MESSAGE=`$MODULE_PATH/logout`
+	echo $MESSAGE 1>&2
 fi
 
 IFS=','
@@ -71,7 +84,7 @@ IFS=','
 TEXT=`cat $AUTH_KEY`
 set -- $TEXT
 authtoken=$1
-echo $authtoken
+echo $authtoken 1>&2
 rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 
 TEXT=`$COMMON_PATH/getStreamParam ${channel}`
@@ -83,19 +96,25 @@ PLAYPATH=$3
 ##########################################################
 # rtmpdump
 ##########################################################
-MESSAGE="$FILE_NAME:$channel rec do"
-echo $MESSAGE
+MESSAGE="$FILE_NAME:$channel $isLive do"
+echo $MESSAGE 1>&2
 #$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
-rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:$authtoken --stop $time --timeout 3600 --live --flv $DUMP_FILE 2> $DISP_MODE
+rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:$authtoken $time --timeout 3600 --live --flv $DUMP_FILE 2> $DISP_MODE
 RTMPDUMP_STATUS=$?
 
+if [ "$isLive" = "live" ]; then
+	MESSAGE="$FILE_NAME:$channel $isLive done"
+	echo $MESSAGE 1>&2
+	exit 0
+fi
+
 if [ $RTMPDUMP_STATUS -ne 0 ]; then
-	MESSAGE="$FILE_NAME:$channel rec miss"
+	MESSAGE="$FILE_NAME:$channel $isLive miss"
 else
-	MESSAGE="$FILE_NAME:$channel rec done"
+	MESSAGE="$FILE_NAME:$channel $isLive done"
 fi
 
 #$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
-echo $MESSAGE
+echo $MESSAGE 1>&2
 exit $RTMPDUMP_STATUS
 

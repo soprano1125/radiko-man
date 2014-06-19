@@ -25,7 +25,16 @@ $ua->agent($user_agent);
 $ua->cookie_jar({file => $cookie_file, autosave => 1});
 
 $res = $ua->post($url . '/login/login', {"mail" => $auth_user, "pass" => $auth_pass});
+if ($res->is_error) {
+	print "failed login.:[$auth_user][login/check]";
+	exit 1;
+}
+
 $res = $ua->get($url . '/webapi/member/login/check');
+if ($res->is_error) {
+	print "failed login.:[$auth_user][login/check]";
+	exit 1;
+}
 
 my $JSON = $res->content;
 $JSON =~ s/{(.*)}/$1/g;
@@ -34,6 +43,6 @@ my ($message, $ret);
 $message = `common/checkPaidMember \'$JSON\'`;
 $ret = $?;
 
-print "$message.:[$auth_user]\n";
+print "$message.:[$auth_user]";
 exit "$ret";
 
