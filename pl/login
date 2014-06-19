@@ -16,8 +16,12 @@ my $auth_user = $cfg->{'premium.auth_mail'};
 my $auth_pass = $cfg->{'premium.auth_pass'};
 my $auth_key = $home_path .'/'. $cfg->{'premium.auth_key'};
 my $cookie_file = $home_path .'/'. $cfg->{'premium.cookie_file'};
+my $timeout = $cfg->{'common.http_timeout'};
+my $user_agent = $cfg->{'common.mozilla_agent'} .' (' . $cfg->{'common.user_agent'} . ') radiko.jp/' . $cfg->{'common.player_ver'};
 
 $ua = LWP::UserAgent->new;
+$ua->timeout($timeout);
+$ua->agent($user_agent);
 $ua->cookie_jar({file => $cookie_file, autosave => 1});
 
 $res = $ua->post($url . '/login/login', {"mail" => $auth_user, "pass" => $auth_pass});

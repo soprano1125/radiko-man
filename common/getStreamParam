@@ -20,8 +20,12 @@ $home_path =~ s/__FILE__//g;
 
 $cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
 my $rtmp_pattern = $cfg->{'common.rtmp_pattern'};
+my $timeout = $cfg->{'common.timeout'};
+my $user_agent = $cfg->{'common.mozilla_agent'} .' (' . $cfg->{'common.user_agent'} . ') radiko.jp/' . $cfg->{'common.player_ver'};
 
 $ua = LWP::UserAgent->new;
+$ua->timeout($timeout);
+$ua->agent($user_agent);
 
 $res = $ua->get("http://radiko.jp/v2/station/stream/$station_id.xml");
 if (!$res->is_success) {
@@ -36,5 +40,4 @@ my ($blank, $protocol, $server, $application, $playpath) = split($rtmp_pattern, 
 print "$protocol://$server,$application,$playpath\n";
 
 exit 0;
-
 

@@ -10,9 +10,9 @@ COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
 ##############################################
 
 ####################################
-# Logout Function -> sh/logout
+# Logout Function
 ####################################
-wget -q \
+wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	--no-check-certificate \
 	--load-cookies $COOKIE_FILE \
 	--save-headers \

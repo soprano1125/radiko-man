@@ -5,6 +5,8 @@
 #
 
 use strict;
+use Config::Simple;
+use File::Spec;
 use LWP::UserAgent;
 use XML::Simple;
 
@@ -13,22 +15,31 @@ if (@ARGV != 2){
 	exit 1;
 }
 
+my ($ua, $req, $res, $cfg);
+
 my $area_id = $ARGV[0];
 my $station_id = $ARGV[1];
-my $ua = LWP::UserAgent->new;
 
-$ua->timeout(10);
-$ua->agent('Mozilla/5.0 (radioman/0.1)');
-my $req = HTTP::Request->new(GET => 'http://radiko.jp/v2/station/list/' . $area_id . '.xml');
-my $res = $ua->request($req);
+my $home_path = File::Spec->rel2abs();
+$home_path =~ s/__FILE__//g;
+
+$cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
+my $timeout = $cfg->{'common.http_timeout'};
+my $user_agent = $cfg->{'common.mozilla_agent'} .' (' . $cfg->{'common.user_agent'} . ') radiko.jp/' . $cfg->{'common.player_ver'};
+
+$ua = LWP::UserAgent->new;
+$ua->timeout($timeout);
+$ua->agent($user_agent);
+
+$req = HTTP::Request->new(GET => 'http://radiko.jp/v2/station/list/' . $area_id . '.xml');
+$res = $ua->request($req);
 
 if (!$res->is_success) {
 	print "Station is not Found. But, please look at the state because it might be all right in the area determined.|Unknown\n";
 	exit 0;
 }
 
-my $xml = XML::Simple->new(keyattr => []);
-my $data = $xml->XMLin($res->content);
+my $data = XML::Simple->new(keyattr => [])->XMLin($res->content);
 
 my ($channel, $station, $status, $ret);
 foreach $station (@{$data->{'station'}}){

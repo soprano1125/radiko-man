@@ -18,14 +18,16 @@ playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
 AUTH_KEY=`$COMMON_PATH/getParam premium auth_key`
 COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
 AREA_FILE=`$COMMON_PATH/getParam common area_file`
+API_URL=`$COMMON_PATH/getParam common api_url`
 ##############################################
 
 #################################
 # get player
 #################################
 if [ ! -f $playerfile ]; then
-	wget -q -O $playerfile $playerurl
+	wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" -O $playerfile $playerurl
 	if [ $? -ne 0 ]; then
+		rm -rf $playerfile
 		ERROR="failed get player"
 		echo "$ERROR"
 		exit 1
@@ -40,6 +42,7 @@ if [ ! -f $keyfile ]; then
 #	BINARY_ID=1
 	swfextract -b $BINARY_ID $playerfile -o $keyfile
 	if [ ! -f $keyfile ]; then
+		rm -rf $playerfile $keyfile
 		ERROR="failed get keydata"
 		echo "$ERROR"
 #		$HOMEPATH/twitter/post.sh "$FILENAME:$channel init miss[$ERROR]. Please see mail."
@@ -53,7 +56,7 @@ fi
 if [ -f auth1_fms ]; then
 	rm -f auth1_fms
 fi
-wget -q \
+wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	--header="pragma: no-cache" \
 	--header="X-Radiko-App: pc_1" \
 	--header="X-Radiko-App-Version: $APP_VERSION" \
@@ -64,9 +67,10 @@ wget -q \
 	--no-check-certificate \
 	--load-cookies $COOKIE_FILE \
 	-O auth1_fms \
-	https://radiko.jp/v2/api/auth1_fms
+	$API_URL/auth1_fms
 
 if [ $? -ne 0 ]; then
+	rm -rf $playerfile $keyfile auth1_fms
 	ERROR="failed auth1 process"
 	echo "$ERROR"
 #	$HOMEPATH/twitter/post.sh "$FILENAME:$channel init miss[$ERROR]. Please see mail."
@@ -96,7 +100,7 @@ rm -f auth1_fms
 if [ -f auth2_fms ]; then
 	rm -f auth2_fms
 fi
-wget -q \
+wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	--header="pragma: no-cache" \
 	--header="X-Radiko-App: pc_1" \
 	--header="X-Radiko-App-Version: $APP_VERSION" \
@@ -108,9 +112,10 @@ wget -q \
 	--no-check-certificate \
 	--load-cookies $COOKIE_FILE \
 	-O auth2_fms \
-	https://radiko.jp/v2/api/auth2_fms
+	$API_URL/auth2_fms
 
 if [ $? -ne 0 -o ! -f auth2_fms ]; then
+	rm -rf $playerfile $keyfile auth1_fms auth2_fms
 	ERROR="failed auth2 process"
 	echo "$ERROR"
 	exit 1
@@ -125,3 +130,4 @@ echo "$areaid" > $AREA_FILE
 rm -rf auth2_fms $keyfile $playerfile 
 echo "authentication success"
 exit 0;
+

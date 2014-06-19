@@ -22,6 +22,8 @@ my $cookie_file = $home_path .'/'. $cfg->{'premium.cookie_file'};
 my $area_file = $home_path .'/'. $cfg->{'common.area_file'};
 my $auth_key = $home_path .'/'. $cfg->{'premium.auth_key'};
 my $api_url = $cfg->{'common.api_url'};
+my $timeout = $cfg->{'common.http_timeout'};
+my $user_agent = $cfg->{'common.mozilla_agent'} .' (' . $cfg->{'common.user_agent'} . ') radiko.jp/' . $cfg->{'common.player_ver'};
 
 my $station_id = $ARGV[0];
 my $isPremium = $ARGV[1];
@@ -29,6 +31,8 @@ my $isPremium = $ARGV[1];
 my ($status, $ret, $area_id, $area_name, $message);
 
 $ua = LWP::UserAgent->new;
+$ua->timeout($timeout);
+$ua->agent($user_agent);
 if (-f $cookie_file) {
 	$ua->cookie_jar({file => "$cookie_file", autosave => 1});
 }

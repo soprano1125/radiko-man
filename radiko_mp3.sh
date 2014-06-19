@@ -38,9 +38,8 @@ fi
 
 #
 # ffmpeg 
-#  *** root 権限でないとradikoユーザーだと書けない ***
 # 
-FFMPEG_LOG="$PROG_PATH/log/$channel_$output_$RECDATE.log"
+FFMPEG_LOG="$PROG_PATH/log/$channel_$FILENAME.log"
 echo $OUT_FILE >> $FFMPEG_LOG
 sudo ffmpeg -y -i $TEMP_PATH/$FILENAME.flv -ab 128k -ar 44100 -ac 2 $OUT_FILE 2>> $FFMPEG_LOG
 FFMPEG_STATUS=$?

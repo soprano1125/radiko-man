@@ -20,10 +20,14 @@ $home_path =~ s/__FILE__//g;
 
 $cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
 my $api_url = $cfg->{'common.api_url'};
+my $timeout = $cfg->{'common.http_timeout'};
+my $user_agent = $cfg->{'common.mozilla_agent'} .' (' . $cfg->{'common.user_agent'} . ') radiko.jp/' . $cfg->{'common.player_ver'};
 
 my $station_id = $ARGV[0];
 
 $ua = LWP::UserAgent->new;
+$ua->timeout($timeout);
+$ua->agent($user_agent);
 
 $res = $ua->get($api_url . '/program/station/today?station_id=' . $station_id);
 if (!$res->is_success) {

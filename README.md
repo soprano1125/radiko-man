@@ -19,6 +19,7 @@ radiko.jp 聴取/録音スクリプト。
             - checkPaidMember ; プレミアムログイン確認
             - getParam        ; ini ファイルのパラメータ取得
             - getRadioStation ; Station ID から放送局を取得
+            - getStreamParam  ; Station ID から録音パラメータを取得
             - base.sh         ; 共通設定
         - check-perl          ; パッケージインストール確認
         - check-tool          ; ツールインストール確認
@@ -82,6 +83,9 @@ $ ./radiko_live.sh channel_name buffer_time premium_mode<free,premium>
        + `application`: rtmp サーバーのアドレス
        + `area_file`: エリア判定保管ファイル
        + `api_url`: API アドレス
+       + `http_timeout`: HTTP でのタイムアウト値
+       + `mozilla_agent`: Mozila のバージョン
+       + `user_agent`: radiko-man のバージョン
 
 ## 関連リンク
 + [radiko.jp](http://www.radiko.jp)

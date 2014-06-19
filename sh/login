@@ -14,12 +14,9 @@ pass=`$COMMON_PATH/getParam premium auth_pass`
 ##############################################
 
 ####################################
-# Logout Function -> sh/login
+# Logout Function
 ####################################
-#################################
-# Login
-#################################
-wget -q \
+wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	--post-data="mail=$mail&pass=$pass" \
 	--keep-session-cookies \
 	--save-cookie=$COOKIE_FILE \
@@ -31,10 +28,10 @@ if [ ! -f $COOKIE_FILE ]; then
 	exit 1
 fi
 
-#################################
+####################################
 # check login
-#################################
-wget -q \
+####################################
+wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	--no-check-certificate \
 	--load-cookies $COOKIE_FILE \
 	-O $checkfile \
@@ -46,9 +43,9 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-#################################
+####################################
 # paid member
-#################################
+####################################
 JSON=`perl -ne 'print $1 if(/\{(.*)\}/i)' $checkfile`
 echo `common/checkPaidMember $JSON`".:[$mail]"
 ret=$?

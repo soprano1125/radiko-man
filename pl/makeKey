@@ -28,6 +28,8 @@ my $cookie_file = $home_path .'/'. $cfg->{'premium.cookie_file'};
 my $auth_key = $home_path .'/'. $cfg->{'premium.auth_key'};
 my $area_file = $home_path .'/'. $cfg->{'common.area_file'};
 my $api_url = $cfg->{'common.api_url'};
+my $timeout = $cfg->{'common.http_timeout'};
+my $user_agent = $cfg->{'common.mozilla_agent'} .' (' . $cfg->{'common.user_agent'} . ') radiko.jp/' . $cfg->{'common.player_ver'};
 
 my $player_file = $home_path .'/player.swf';
 my $keyfile = $home_path .'/authkey.jpg';
@@ -41,6 +43,8 @@ if (-f $cookie_file) {
 	$ua->cookie_jar({file => "$cookie_file", autosave => 1});
 }
 
+$ua->timeout($timeout);
+$ua->agent($user_agent);
 $ua->default_header("pragma"               => "no-cache");
 $ua->default_header("X-Radiko-App"         => "pc_1");
 $ua->default_header("X-Radiko-App-Version" => "$APP_VERSION");

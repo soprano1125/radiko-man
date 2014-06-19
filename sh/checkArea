@@ -34,7 +34,7 @@ if [ $paid_member -eq 3 -a $isPremium -eq 0 ]; then
 	area_id="premium";
 	area_name=$area_id;
 
-	wget -q -O $station_id-program.xml $API_URL/program/station/today?station_id=$station_id
+	wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" -O $station_id-program.xml $API_URL/program/station/today?station_id=$station_id
 	if [ $? -eq 0 -a -s $station_id-program.xml ]; then
 		status="Station is Found."
 		ret=0
