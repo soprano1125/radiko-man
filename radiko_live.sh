@@ -3,10 +3,11 @@
 
 if [ $# -eq 1 ]; then
 	channel=$1
+	flgPremium="free"
 
 elif [ $# -eq 2 ]; then
 	channel=$1
-	flgPremium=$3
+	flgPremium=$2
 
 else
 	echo "usage : $0 channel_name [premium_mode<free,premium>]"
@@ -26,6 +27,7 @@ STATION_NAME=`$COMMON_PATH/getRadioStation $channel`
 #
 # rtmpdump
 #
-$PROG_PATH/radiko_download.sh $channel live $flgPremium live-$REC_DATE | vlc --meta-title " " --meta-author $AUTHOR --meta-artist $STATION_NAME --meta-date $REC_DATE --play-and-exit --no-one-instance - 2> /dev/null
+$PROG_PATH/radiko_download.sh $channel live $flgPremium live-$REC_DATE | vlc --meta-title " " --meta-author $AUTHOR --meta-artist $STATION_NAME --meta-date $REC_DATE --play-and-exit --no-one-instance --no-sout-display-video - 2> /dev/null 
+
 exit 0
 

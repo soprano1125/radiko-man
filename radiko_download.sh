@@ -103,9 +103,7 @@ rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playeru
 RTMPDUMP_STATUS=$?
 
 if [ "$isLive" = "live" ]; then
-	MESSAGE="$FILE_NAME:$channel $isLive done"
-	echo $MESSAGE 1>&2
-	exit 0
+	RTMPDUMP_STATUS=$((RTMPDUMP_STATUS - 1))
 fi
 
 if [ $RTMPDUMP_STATUS -ne 0 ]; then

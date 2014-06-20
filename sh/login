@@ -24,7 +24,7 @@ wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	$url/login/login
 
 if [ ! -f $COOKIE_FILE ]; then
-	echo -n "failed login.:[$mail]"
+	echo -n "failed login.:[$auth_mail]"
 	exit 1;
 fi
 
@@ -38,7 +38,7 @@ wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	$url/webapi/member/login/check
 
 if [ $? -ne 0 ]; then
-	echo -n "failed login.:[$mail]"
+	echo -n "failed login.:[$auth_mail]"
 	rm -rf $checkfile
 	exit 1;
 fi
@@ -47,7 +47,7 @@ fi
 # paid member
 ####################################
 JSON=`perl -ne 'print $1 if(/\{(.*)\}/i)' $checkfile`
-echo -n `common/checkPaidMember $JSON`".:[$mail]"
+echo -n `common/checkPaidMember $JSON`".:[$auth_mail]"
 ret=$?
 isPremium=$ret
 rm -rf $checkfile
