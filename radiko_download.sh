@@ -33,12 +33,12 @@ FILE_NAME=`echo $DUMP_FILE | sed -e "s|$TEMP_PATH\/||g"`
 
 isLive=`echo FILE_NAME | perl -ne 'print $1 if(/^(\w+)-(\d+)/i)'`
 if [ "$time" = "live" ]; then
-	time=""
+	time_param=""
 	isLive="live"
 	DUMP_FILE="-"
 	DISP_MODE="/dev/null"
 else
-	time="-B $time"
+	time_param="-B $time"
 	isLive="rec"
 fi
 
@@ -87,7 +87,7 @@ authtoken=$1
 echo $authtoken 1>&2
 rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 
-TEXT=`$COMMON_PATH/getStreamParam ${channel}`
+TEXT=`$COMMON_PATH/getStreamParam $channel`
 set -- $TEXT
 SERVER=$1
 APPLICATION=$2
@@ -99,7 +99,7 @@ PLAYPATH=$3
 MESSAGE="$FILE_NAME:$channel $isLive do"
 echo $MESSAGE 1>&2
 #$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
-rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:$authtoken $time --timeout 3600 --live --flv $DUMP_FILE 2> $DISP_MODE
+rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:$authtoken $time_param --timeout 3600 --live --flv $DUMP_FILE 2> $DISP_MODE
 RTMPDUMP_STATUS=$?
 
 if [ "$isLive" = "live" ]; then
