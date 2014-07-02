@@ -18,14 +18,7 @@ else
 	exit 1
 fi
 
-HOME_PATH=/home/ubuntu/radiko-man
-PROG_PATH=$HOME_PATH
-COMMON_PATH=$HOME_PATH/common
-RADIKO_COMMON=$PROG_PATH/common
-
-TEMP_PATH=$HOME_PATH/share/temp
-
-. $COMMON_PATH/base.sh
+. common/base.sh
 cd $PROG_PATH
 
 OUT_DIR=$HOME_PATH/share/$channel

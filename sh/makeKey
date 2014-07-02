@@ -7,14 +7,8 @@ else
 	exit 1
 fi
 
+. common/base.sh
 HOME_PATH=`echo \`pwd\` | sed -e 's|/sh||g'`
-PROG_PATH=$HOME_PATH
-COMMON_PATH=$HOME_PATH/common
-RADIKO_COMMON=$PROG_PATH/common
-
-TEMP_PATH=$HOME_PATH/share/temp
-
-. $RADIKO_COMMON/base.sh
 
 ##############################################
 playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"

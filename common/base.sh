@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#########################################################
+HOME_PATH=/home/ubuntu/radiko-man
+PROG_PATH=$HOME_PATH
+COMMON_PATH=$HOME_PATH/common
+RADIKO_COMMON=$PROG_PATH/common
+
+TEMP_PATH=$HOME_PATH/share/temp
+#########################################################
 
 if [ "$REC_DATE" == "" ]; then
 	REC_DATE=`date +"%Y%m%d%H%M"`
