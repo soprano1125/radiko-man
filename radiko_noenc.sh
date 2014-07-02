@@ -20,17 +20,19 @@ fi
 
 HOME_PATH=/home/ubuntu/radiko-man
 PROG_PATH=$HOME_PATH
+COMMON_PATH=$HOME_PATH/common
+RADIKO_COMMON=$PROG_PATH/common
+
 TEMP_PATH=$HOME_PATH/share/temp
-COMMON_PATH=$PROG_PATH/common
 
 . $COMMON_PATH/base.sh
 cd $PROG_PATH
 
-OUT_DIR=$HOME_PATH/share/${channel}
+OUT_DIR=$HOME_PATH/share/$channel
 OUT_FILE=$OUT_DIR/$FILENAME.flv
 FILE_OWNER=`$COMMON_PATH/getParam common owner`
 
-mkdir -p $OUT_DIR $TEMP_PATH $PROG_PATH/log/
+mkdir -p $TEMP_PATH $PROG_PATH/log/ $OUT_DIR
 $PROG_PATH/radiko_download.sh $channel $time $flgPremium $TEMP_PATH/$FILENAME.flv
 if [ $? -ne 0 ]; then
 	exit 1;

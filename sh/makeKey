@@ -8,17 +8,27 @@ else
 fi
 
 HOME_PATH=`echo \`pwd\` | sed -e 's/\/sh//g'`
+PROG_PATH=$HOME_PATH
 COMMON_PATH=$HOME_PATH/common
-. $COMMON_PATH/base.sh
+RADIKO_COMMON=$PROG_PATH/common
+
+TEMP_PATH=$HOME_PATH/share/temp
+
+. $RADIKO_COMMON/base.sh
 
 ##############################################
-keyfile="$HOME_PATH/authkey.png"
-playerfile="$HOME_PATH/player.swf"
 playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
-AUTH_KEY=`$COMMON_PATH/getParam premium auth_key`
-COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
-AREA_FILE=`$COMMON_PATH/getParam common area_file`
+
 API_URL=`$COMMON_PATH/getParam common api_url`
+
+keyfile="$TEMP_PATH/authkey.png"
+playerfile="$TEMP_PATH/player.swf"
+auth1_fms="$TEMP_PATH/auth1_fms"
+auth2_fms="$TEMP_PATH/auth2_fms"
+
+AUTH_KEY="$TEMP_PATH/`$COMMON_PATH/getParam premium auth_key`"
+COOKIE_FILE="$TEMP_PATH/`$COMMON_PATH/getParam premium cookie_file`"
+AREA_FILE="$TEMP_PATH/`$COMMON_PATH/getParam common area_file`"
 ##############################################
 
 
@@ -55,8 +65,8 @@ fi
 #################################
 # access auth1_fms
 #################################
-if [ -f auth1_fms ]; then
-	rm -f auth1_fms
+if [ -f $auth1_fms ]; then
+	rm -f $auth1_fms
 fi
 wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	--header="pragma: no-cache" \
@@ -68,11 +78,11 @@ wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	--save-headers \
 	--no-check-certificate \
 	--load-cookies $COOKIE_FILE \
-	-O auth1_fms \
+	-O $auth1_fms \
 	$API_URL/auth1_fms
 
 if [ $? -ne 0 ]; then
-	rm -rf $playerfile $keyfile auth1_fms
+	rm -rf $playerfile $keyfile $auth1_fms
 	ERROR="failed auth1 process"
 	echo -n "$ERROR"
 #	$HOMEPATH/twitter/post.sh "$FILENAME:$channel init miss[$ERROR]. Please see mail."
@@ -82,9 +92,9 @@ fi
 #################################
 # get partial key
 #################################
-authtoken=`perl -ne 'print $1 if(/x-radiko-authtoken: ([\w-]+)/i)' auth1_fms`
-offset=`perl -ne 'print $1 if(/x-radiko-keyoffset: (\d+)/i)' auth1_fms`
-length=`perl -ne 'print $1 if(/x-radiko-keylength: (\d+)/i)' auth1_fms`
+authtoken=`perl -ne 'print $1 if(/x-radiko-authtoken: ([\w-]+)/i)' $auth1_fms`
+offset=`perl -ne 'print $1 if(/x-radiko-keyoffset: (\d+)/i)' $auth1_fms`
+length=`perl -ne 'print $1 if(/x-radiko-keylength: (\d+)/i)' $auth1_fms`
 partialkey=`dd if=$keyfile bs=1 skip=$offset count=$length 2> /dev/null | base64`
 
 paid_member=0
@@ -94,13 +104,13 @@ fi
 echo $authtoken,$partialkey,$paid_member > $AUTH_KEY
 #echo "AUTH_KEY: `cat $AUTH_KEY`"
 #echo -e "authtoken: $authtoken \noffset: $offset \nlength: $length \npartialkey: $partialkey"
-rm -f auth1_fms
+rm -f $auth1_fms
 
 #################################
 # access auth2_fms
 #################################
-if [ -f auth2_fms ]; then
-	rm -f auth2_fms
+if [ -f $auth2_fms ]; then
+	rm -f $auth2_fms
 fi
 wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	--header="pragma: no-cache" \
@@ -113,11 +123,11 @@ wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	--post-data='\r\n' \
 	--no-check-certificate \
 	--load-cookies $COOKIE_FILE \
-	-O auth2_fms \
+	-O $auth2_fms \
 	$API_URL/auth2_fms
 
-if [ $? -ne 0 -o ! -f auth2_fms ]; then
-	rm -rf $playerfile $keyfile auth1_fms auth2_fms
+if [ $? -ne 0 -o ! -f $auth2_fms ]; then
+	rm -rf $playerfile $keyfile $auth2_fms
 	ERROR="failed auth2 process"
 	echo -n "$ERROR"
 	exit 1
@@ -126,10 +136,10 @@ fi
 #################################
 # get AreaID
 #################################
-areaid=`perl -ne 'print "$1,$2,$3" if(/([^,]+),([^,]+),([^,]+)/i)' auth2_fms`
+areaid=`perl -ne 'print "$1,$2,$3" if(/([^,]+),([^,]+),([^,]+)/i)' $auth2_fms`
 echo "$areaid" > $AREA_FILE
 
-rm -rf auth2_fms $keyfile $playerfile 
+rm -rf $playerfile $keyfile $auth2_fms
 echo -n "authentication success"
 exit 0;
 

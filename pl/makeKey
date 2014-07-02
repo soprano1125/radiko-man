@@ -21,18 +21,21 @@ my ($ua, $res, $cfg);
 my $APP_VERSION = $ARGV[0];
 
 my $home_path = File::Spec->rel2abs();
+my $temp_path = "share/temp";
 $home_path =~ s/__FILE__//g;
 
 $cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
-my $cookie_file = $home_path .'/'. $cfg->{'premium.cookie_file'};
-my $auth_key = $home_path .'/'. $cfg->{'premium.auth_key'};
-my $area_file = $home_path .'/'. $cfg->{'common.area_file'};
+
 my $api_url = $cfg->{'common.api_url'};
 my $timeout = $cfg->{'common.http_timeout'};
 my $user_agent = $cfg->{'common.mozilla_agent'} .' (' . $cfg->{'common.user_agent'} . ') radiko.jp/' . $cfg->{'common.player_ver'};
 
-my $player_file = $home_path .'/player.swf';
-my $keyfile = $home_path .'/authkey.jpg';
+my $cookie_file = "$home_path/$temp_path/" . $cfg->{'premium.cookie_file'};
+my $auth_key = "$home_path/$temp_path/" . $cfg->{'premium.auth_key'};
+my $area_file = "$home_path/$temp_path/" . $cfg->{'common.area_file'};
+my $player_file = "$home_path/$temp_path/player.swf";
+my $keyfile = "$home_path/$temp_path/authkey.jpg";
+
 my $ERROR;
 
 ###############################################

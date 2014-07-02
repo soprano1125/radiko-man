@@ -14,20 +14,23 @@ fi
 
 HOME_PATH=/home/ubuntu/radiko-man
 PROG_PATH=$HOME_PATH
-TEMP_PATH=$HOME_PATH/share/temp
-COMMON_PATH=$PROG_PATH/common
+COMMON_PATH=$HOME_PATH/common
+RADIKO_COMMON=$PROG_PATH/common
 
-. $COMMON_PATH/base.sh
+TEMP_PATH=$HOME_PATH/share/temp
+
+. $RADIKO_COMMON/base.sh
 cd $PROG_PATH
 
 PROG_MODE=`$COMMON_PATH/getParam common prog_mode`
-MODULE_PATH=$PROG_PATH/$PROG_MODE
+MODULE_PATH="$PROG_PATH/$PROG_MODE"
 
 APP_VERSION=`$COMMON_PATH/getParam common player_ver`
 playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
-AUTH_KEY=`$COMMON_PATH/getParam premium auth_key`
-COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
-AREA_FILE=`$COMMON_PATH/getParam common area_file`
+
+AUTH_KEY="$TEMP_PATH/`$COMMON_PATH/getParam premium auth_key`"
+COOKIE_FILE="$TEMP_PATH/`$COMMON_PATH/getParam premium cookie_file`"
+AREA_FILE="$TEMP_PATH/`$COMMON_PATH/getParam common area_file`"
 
 FILE_NAME=`echo $DUMP_FILE | sed -e "s|$TEMP_PATH\/||g"`
 
@@ -42,6 +45,9 @@ else
 	isLive="rec"
 fi
 
+##########################################################
+# radiko.jp premium Login
+##########################################################
 isPremium="FreeMode"
 isPremiumRet=1
 if [ "$flgPremium" = "premium" ]; then
@@ -51,6 +57,9 @@ if [ "$flgPremium" = "premium" ]; then
 	isPremium="PremiumMode"
 fi
 
+##########################################################
+# radiko.jp make Authkey
+##########################################################
 MESSAGE=`$MODULE_PATH/makeKey $APP_VERSION`
 if [ $? -ne 0 ]; then
 	if [ $isPremiumRet -ne 1 ]; then MESSAGE_DUMMY=`$MODULE_PATH/logout`; isPremium="$isPremium->FreeMode"; fi
@@ -62,6 +71,9 @@ if [ $? -ne 0 ]; then
 fi
 echo $MESSAGE 1>&2
 
+##########################################################
+# radiko.jp Check Area
+##########################################################
 MESSAGE=`$MODULE_PATH/checkArea $channel $isPremiumRet`
 if [ $? -ne 0 ]; then
 	if [ $isPremiumRet -ne 1 ]; then MESSAGE_DUMMY=`$MODULE_PATH/logout`; isPremium="$isPremium->FreeMode"; fi
@@ -74,6 +86,9 @@ if [ $? -ne 0 ]; then
 fi
 echo $MESSAGE 1>&2
 
+##########################################################
+# radiko.jp Premium Logout
+##########################################################
 if [ $isPremiumRet -ne 1 ]; then
 	MESSAGE=`$MODULE_PATH/logout`
 	echo $MESSAGE 1>&2
@@ -81,13 +96,19 @@ fi
 
 IFS=','
 
+##########################################################
+# radiko.jp get Authkey 
+##########################################################
 TEXT=`cat $AUTH_KEY`
 set -- $TEXT
 authtoken=$1
 echo $authtoken 1>&2
 rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 
-TEXT=`$COMMON_PATH/getStreamParam $channel`
+##########################################################
+# radiko.jp get Stream parameter
+##########################################################
+TEXT=`$RADIKO_COMMON/getStreamParam $channel`
 set -- $TEXT
 SERVER=$1
 APPLICATION=$2

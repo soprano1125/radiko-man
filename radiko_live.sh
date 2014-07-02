@@ -16,18 +16,22 @@ fi
 
 HOME_PATH=/home/ubuntu/radiko-man
 PROG_PATH=$HOME_PATH
-COMMON_PATH=$PROG_PATH/common
+COMMON_PATH=$HOME_PATH/common
+RADIKO_COMMON=$PROG_PATH/common
 
-. $COMMON_PATH/base.sh
+TEMP_PATH=$HOME_PATH/share/temp
+
+. $RADIKO_COMMON/base.sh
 cd $PROG_PATH
 
 AUTHOR="radiko.jp"
-STATION_NAME=`$COMMON_PATH/getRadioStation $channel`
+STATION_NAME=`$RADIKO_COMMON/getRadioStation $channel`
 
 #
 # rtmpdump
 #
-$PROG_PATH/radiko_download.sh $channel live $flgPremium live-$REC_DATE | vlc --meta-title " " --meta-author "$AUTHOR" --meta-artist "$STATION_NAME" --meta-date $REC_DATE --play-and-exit --no-one-instance --no-sout-display-video - 2> /dev/null 
+mkdir -p $TEMP_PATH
+$PROG_PATH/radiko_download.sh $channel live $flgPremium live-$REC_DATE | vlc --meta-title " " --meta-author "$AUTHOR" --meta-artist "$STATION_NAME" --meta-date "$REC_DATE" --play-and-exit --no-one-instance --no-sout-display-video - 2> /dev/null 
 
 exit 0
 

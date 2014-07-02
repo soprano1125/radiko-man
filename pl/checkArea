@@ -12,30 +12,32 @@ if (@ARGV != 2){
 	exit 1;
 }
 
+###############################################
+# set Module
+###############################################
 my ($ua, $res, $cfg);
 
+###############################################
+# set Value
+###############################################
 my $home_path = File::Spec->rel2abs();
+my $temp_path = "share/temp";
 $home_path =~ s/__FILE__//g;
 
 $cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
-my $cookie_file = $home_path .'/'. $cfg->{'premium.cookie_file'};
-my $area_file = $home_path .'/'. $cfg->{'common.area_file'};
-my $auth_key = $home_path .'/'. $cfg->{'premium.auth_key'};
+
 my $api_url = $cfg->{'common.api_url'};
 my $timeout = $cfg->{'common.http_timeout'};
 my $user_agent = $cfg->{'common.mozilla_agent'} .' (' . $cfg->{'common.user_agent'} . ') radiko.jp/' . $cfg->{'common.player_ver'};
+
+my $cookie_file = "$home_path/$temp_path/" . $cfg->{'premium.cookie_file'};
+my $auth_key = "$home_path/$temp_path/" . $cfg->{'premium.auth_key'};
+my $area_file = "$home_path/$temp_path/" . $cfg->{'common.area_file'};
 
 my $station_id = $ARGV[0];
 my $isPremium = $ARGV[1];
 
 my ($status, $ret, $area_id, $area_name, $message);
-
-$ua = LWP::UserAgent->new;
-$ua->timeout($timeout);
-$ua->agent($user_agent);
-if (-f $cookie_file) {
-	$ua->cookie_jar({file => "$cookie_file", autosave => 1});
-}
 
 open(IN, "$auth_key");
 my $radiko_keys = <IN>;
@@ -46,9 +48,16 @@ $paid_member =~ s/\n//g;
 #print "check: $paid_member, $isPremium => " . (($paid_member == 3) && $isPremium) . "\n";
 
 if (($paid_member == 3) && !$isPremium) {
-##################################
-# Premium 
-##################################
+	##################################
+	# Premium 
+	##################################
+	$ua = LWP::UserAgent->new;
+	$ua->timeout($timeout);
+	$ua->agent($user_agent);
+	if (-f $cookie_file) {
+		$ua->cookie_jar({file => "$cookie_file", autosave => 1});
+	}
+
 	$area_id = "premium";
 	$area_name = $area_id;
 
@@ -63,9 +72,9 @@ if (($paid_member == 3) && !$isPremium) {
 	$message = "$area_name|$status($area_id)";
 
 } else {
-##################################
-# not Premium 
-##################################
+	##################################
+	# not Premium 
+	##################################
 	open(IN, "$area_file");
 	$area_id = <IN>;
 	close(IN);

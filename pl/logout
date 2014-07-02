@@ -8,12 +8,15 @@ use LWP::UserAgent;
 my ($ua, $cfg);
 
 my $home_path = File::Spec->rel2abs();
+my $temp_path = "share/temp";
 $home_path =~ s/__FILE__//g;
 
 $cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
+
+my $cookie_file = "$home_path/$temp_path/" . $cfg->{'premium.cookie_file'};
+my $auth_key = "$home_path/$temp_path/" . $cfg->{'premium.auth_key'};
+
 my $url = $cfg->{'premium.auth_url'};
-my $auth_key = $home_path .'/'. $cfg->{'premium.auth_key'};
-my $cookie_file = $home_path .'/'. $cfg->{'premium.cookie_file'};
 my $timeout = $cfg->{'common.http_timeout'};
 my $user_agent = $cfg->{'common.mozilla_agent'} .' (' . $cfg->{'common.user_agent'} . ') radiko.jp/' . $cfg->{'common.player_ver'};
 

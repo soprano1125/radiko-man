@@ -2,19 +2,26 @@
 
 
 HOME_PATH=`echo \`pwd\` | sed -e 's/\/sh//g'`
+PROG_PATH=$HOME_PATH
 COMMON_PATH=$HOME_PATH/common
-. $COMMON_PATH/base.sh
+RADIKO_COMMON=$PROG_PATH/common
+
+TEMP_PATH=$HOME_PATH/share/temp
+
+. $RADIKO_COMMON/base.sh
 
 ##############################################
-checkfile="./check.txt"
-url=`$COMMON_PATH/getParam premium auth_url`
-COOKIE_FILE=`$COMMON_PATH/getParam premium cookie_file`
-auth_mail=`$COMMON_PATH/getParam premium auth_mail`
-auth_pass=`$COMMON_PATH/getParam premium auth_pass`
+url="`$COMMON_PATH/getParam premium auth_url`"
+
+auth_mail="`$COMMON_PATH/getParam premium auth_mail`"
+auth_pass="`$COMMON_PATH/getParam premium auth_pass`"
+
+checkfile="$TEMP_PATH/check.txt"
+COOKIE_FILE="$TEMP_PATH/`$COMMON_PATH/getParam premium cookie_file`"
 ##############################################
 
 ####################################
-# Login
+# Login Function
 ####################################
 wget -q -T $HTTP_TIMEOUT -U "$USER_AGENT" \
 	--post-data="mail=$auth_mail&pass=$auth_pass" \
