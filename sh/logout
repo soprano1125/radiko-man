@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-HOME_PATH=`echo \`pwd\` | sed -e 's/\/sh//g'`
+HOME_PATH=`echo \`pwd\` | sed -e 's|/sh||g'`
 PROG_PATH=$HOME_PATH
 COMMON_PATH=$HOME_PATH/common
 RADIKO_COMMON=$PROG_PATH/common

@@ -3,13 +3,12 @@
 if [ $# -eq 2 ]; then
 	station_id=$1;
 	isPremium=$2;
-
 else
 	echo "usage : $0 station_id isPremium<0,1>"
 	exit 1
 fi
 
-HOME_PATH=`echo \`pwd\` | sed -e 's/\/sh//g'`
+HOME_PATH=`echo \`pwd\` | sed -e 's|/sh||g'`
 PROG_PATH=$HOME_PATH
 COMMON_PATH=$HOME_PATH/common
 RADIKO_COMMON=$PROG_PATH/common
