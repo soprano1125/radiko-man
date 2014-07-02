@@ -51,7 +51,7 @@ else
 	area_id=`perl -ne 'print $1 if(/^([^,]+),([^,]+),([^,]+)/i)' $AREA_FILE`
 	rm -rf $AREA_FILE
 
-	message=`common/checkIPArea $area_id $station_id`
+	message=`$RADIKO_COMMON/checkIPArea $area_id $station_id`
 	ret=$?
 fi
 
