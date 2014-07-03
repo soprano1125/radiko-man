@@ -15,7 +15,7 @@ $home_path =~ s/__FILE__//g;
 
 my $cfg;
 
-$cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
+$cfg = new Config::Simple("$home_path/radiko.ini")->vars();
 my $auth_key = $home_path .'/share/temp/'. $cfg->{'premium.auth_key'};
 
 my $JSON = '{' . $ARGV[0] . '}';

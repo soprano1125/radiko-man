@@ -1,0 +1,30 @@
+#!/usr/bin/perl --
+
+use strict;
+use Config::Simple;
+use File::Spec;
+use LWP::UserAgent;
+use XML::Simple;
+
+if (@ARGV != 2){
+	print "usage: " . __FILE__ . " stream_site player_version\n";
+	exit 1;
+}
+
+my ($ua, $res, $cfg, $data);
+
+my $stream_site = $ARGV[0];
+my $player_version = $ARGV[1];
+
+my $home_path = File::Spec->rel2abs();
+my $script_name = __FILE__;
+$home_path =~ s/__FILE__//g;
+$script_name =~ s/$home_path//g;
+
+$cfg = new Config::Simple("$home_path/radiko.ini")->vars();
+my $user_agent = sprintf("%s (%s) %s/%s\n", $cfg->{'common.mozilla_agent'}, $cfg->{'common.user_agent'}, $stream_site, $player_version);
+#print STDERR "$user_agent";
+print $user_agent;
+
+exit 0;
+

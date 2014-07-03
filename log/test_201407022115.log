@@ -1,0 +1,22 @@
+/home/ubuntu/radiko-man/share/FMJ/test_201407022115.mp3
+ffmpeg version 0.8.12-6:0.8.12-0ubuntu0.13.10.1, Copyright (c) 2000-2014 the Libav developers
+  built on Jun 10 2014 15:33:35 with gcc 4.8.1
+*** THIS PROGRAM IS DEPRECATED ***
+This program is only provided for compatibility and will be removed in a future release. Please use avconv instead.
+[flv @ 0x15da7e0] max_analyze_duration reached
+[flv @ 0x15da7e0] Estimating duration from bitrate, this may be inaccurate
+Input #0, flv, from '/home/ubuntu/radiko-man/share/temp/test_201407022115.flv':
+  Metadata:
+    StreamTitle     : 
+  Duration: 00:00:10.02, start: 0.000000, bitrate: N/A
+    Stream #0.0: Audio: aac, 48000 Hz, stereo, s16
+Output #0, mp3, to '/home/ubuntu/radiko-man/share/FMJ/test_201407022115.mp3':
+  Metadata:
+    StreamTitle     : 
+    TSSE            : Lavf53.21.1
+    Stream #0.0: Audio: libmp3lame, 44100 Hz, stereo, s16, 128 kb/s
+Stream mapping:
+  Stream #0.0 -> #0.0
+Press ctrl-c to stop encoding
+size=     158kB time=10.11 bitrate= 128.1kbits/s    
+video:0kB audio:158kB global headers:0kB muxing overhead 0.099536%

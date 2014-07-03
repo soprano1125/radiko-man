@@ -18,7 +18,7 @@ my ($ua, $res, $cfg, $data);
 my $home_path = File::Spec->rel2abs();
 $home_path =~ s/__FILE__//g;
 
-$cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
+$cfg = new Config::Simple("$home_path/radiko.ini")->vars();
 my $api_url = $cfg->{'common.api_url'};
 my $timeout = $cfg->{'common.http_timeout'};
 my $user_agent = $cfg->{'common.mozilla_agent'} .' (' . $cfg->{'common.user_agent'} . ') radiko.jp/' . $cfg->{'common.player_ver'};

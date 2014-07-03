@@ -14,8 +14,8 @@ if [ "$REC_DATE" == "" ]; then
 fi
 FILENAME=$output"_"$REC_DATE
 
-USER_AGENT="`$COMMON_PATH/getParam common mozilla_agent` (`$COMMON_PATH/getParam common user_agent`) radiko.jp/`$COMMON_PATH/getParam common player_ver`"
-HTTP_TIMEOUT=`$COMMON_PATH/getParam common http_timeout`
+USER_AGENT="`$COMMON_PATH/makeUserAgent radiko.jp \`$COMMON_PATH/getParam common player_ver\``"
+HTTP_TIMEOUT="`$COMMON_PATH/getParam common http_timeout`"
 
 TTY=`tty`
 if [ "$TTY" == "not a tty" ]; then
