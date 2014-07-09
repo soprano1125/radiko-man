@@ -4,16 +4,10 @@ radiko.jp 聴取/録音スクリプト。
 
 ## ファイル内容
     + radiko-man
-        - pl                  ; Perl 版
-            - login           ; プレミアム ログイン
-            - logout          ; プレミアム ログアウト
-            - makeKey         ; rtmpdump で使う token 取得
-            - checkArea       ; エリア判定
-        - sh                  ; シェルスクリプト版
-            - login           ; プレミアム ログイン
-            - logout          ; プレミアム ログアウト
-            - makeKey         ; rtmpdump で使う token 取得
-            - checkArea       ; エリア判定
+        - login               ; プレミアム ログイン
+        - logout              ; プレミアム ログアウト
+        - makeKey             ; rtmpdump で使う token 取得
+        - checkArea           ; エリア判定
         - common              ; 共通ファイル
             - checkIPArea     ; 非会員用エリア判定
             - checkPaidMember ; プレミアムログイン確認
