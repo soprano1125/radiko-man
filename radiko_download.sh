@@ -15,8 +15,7 @@ fi
 . common/base.sh
 cd $PROG_PATH
 
-PROG_MODE=`$COMMON_PATH/getParam common prog_mode`
-MODULE_PATH="$PROG_PATH/$PROG_MODE"
+MODULE_PATH="$PROG_PATH"
 
 APP_VERSION=`$COMMON_PATH/getParam common player_ver`
 playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
