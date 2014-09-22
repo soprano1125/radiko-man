@@ -5,6 +5,7 @@ use Config::Simple;
 use File::Spec;
 use LWP::UserAgent;
 use XML::Simple;
+use Data::Dumper;
 
 if (@ARGV != 1){
 	print "usage: " . __FILE__ . " station_id\n";
@@ -28,13 +29,13 @@ $ua = LWP::UserAgent->new;
 $ua->timeout($timeout);
 $ua->agent($user_agent);
 
-$res = $ua->get("http://radiko.jp/v2/station/stream/$station_id.xml");
+$res = $ua->get("http://radiko.jp/v2/station/stream_multi/$station_id.xml");
 if (!$res->is_success) {
 	print "Station is not Found.\n";
 	exit 1;
 }
 
-my $stream_url = XML::Simple->new(keyattr => [])->XMLin($res->content)->{"item"}[0];
+my $stream_url = XML::Simple->new(keyattr => [])->XMLin($res->content)->{"item"}[0]->{"content"};
 # rtmpe://w-radiko.smartstream.ne.jp/FMJ/_definst_/simul-stream.stream
 
 my ($blank, $protocol, $server, $application, $playpath) = split($rtmp_pattern, $stream_url);
