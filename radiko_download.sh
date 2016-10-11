@@ -19,7 +19,8 @@ PROG_MODE=`$COMMON_PATH/getParam common prog_mode`
 MODULE_PATH="$PROG_PATH/$PROG_MODE"
 
 APP_VERSION=`$COMMON_PATH/getParam common player_ver`
-playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
+playerurl=`$COMMON_PATH/getParam common player_url`
+#playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
 
 AUTH_KEY="$TEMP_PATH/`$COMMON_PATH/getParam premium auth_key`"
 COOKIE_FILE="$TEMP_PATH/`$COMMON_PATH/getParam premium cookie_file`"

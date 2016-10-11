@@ -35,6 +35,7 @@ my $cookie_file = "$home_path/$temp_path/" . $cfg->{'premium.cookie_file'};
 my $auth_key = "$home_path/$temp_path/" . $cfg->{'premium.auth_key'};
 my $area_file = "$home_path/$temp_path/" . $cfg->{'common.area_file'};
 my $player_file = "$home_path/$temp_path/player.swf";
+my $player_url = $cfg->{'common.player_url'};
 my $keyfile = "$home_path/$temp_path/authkey.jpg";
 
 my $ERROR;
@@ -50,15 +51,16 @@ if (-f $cookie_file) {
 $ua->timeout($timeout);
 $ua->agent($user_agent);
 $ua->default_header("pragma"               => "no-cache");
-$ua->default_header("X-Radiko-App"         => "pc_1");
-$ua->default_header("X-Radiko-App-Version" => "$APP_VERSION");
+$ua->default_header("X-Radiko-App"         => "pc_ts");
+#$ua->default_header("X-Radiko-App-Version" => "$APP_VERSION");
+$ua->default_header("X-Radiko-App-Version" => "4.0.0");
 $ua->default_header("X-Radiko-User"        => "test-stream");
 $ua->default_header("X-Radiko-Device"      => "pc");
 
 ###############################################
 # get Player
 ###############################################
-my $player_url = "http://radiko.jp/player/swf/player_$APP_VERSION.swf";
+#my $player_url = "http://radiko.jp/player/swf/player_$APP_VERSION.swf";
 $res = $ua->get($player_url);
 if (!$res->is_success) {
 	$ERROR = "failed getPlater process.";
@@ -75,10 +77,10 @@ if (! -f "$player_file") {
 # get KeyData
 ###############################################
 my ($pattern, $BINARY_ID);
-$pattern = '\[-b\] 11 Binarys: ID\(s\) (\d+)-(\d+), (\d+)-(\d+)\n';
+$pattern = '\[-b\] 10 Binarys: ID\(s\) (\d+)-(\d+)\n';
 
 $BINARY_ID = `swfextract $player_file | grep Binarys`;
-$BINARY_ID =~ s/$pattern/$4/g;
+$BINARY_ID =~ s/$pattern/$2/g;
 $BINARY_ID =~ s/ //g;
 #$BINARY_ID = 1;
 `swfextract -b $BINARY_ID $player_file -o $keyfile`;
