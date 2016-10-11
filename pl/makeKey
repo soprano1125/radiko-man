@@ -52,8 +52,7 @@ $ua->timeout($timeout);
 $ua->agent($user_agent);
 $ua->default_header("pragma"               => "no-cache");
 $ua->default_header("X-Radiko-App"         => "pc_ts");
-#$ua->default_header("X-Radiko-App-Version" => "$APP_VERSION");
-$ua->default_header("X-Radiko-App-Version" => "4.0.0");
+$ua->default_header("X-Radiko-App-Version" => "$APP_VERSION");
 $ua->default_header("X-Radiko-User"        => "test-stream");
 $ua->default_header("X-Radiko-Device"      => "pc");
 
