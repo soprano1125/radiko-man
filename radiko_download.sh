@@ -20,7 +20,6 @@ MODULE_PATH="$PROG_PATH/$PROG_MODE"
 
 APP_VERSION=`$COMMON_PATH/getParam common player_ver`
 playerurl=`$COMMON_PATH/getParam common player_url`
-#playerurl="http://radiko.jp/player/swf/player_$APP_VERSION.swf"
 
 AUTH_KEY="$TEMP_PATH/`$COMMON_PATH/getParam premium auth_key`"
 COOKIE_FILE="$TEMP_PATH/`$COMMON_PATH/getParam premium cookie_file`"
@@ -32,10 +31,20 @@ isLive=`echo FILE_NAME | perl -ne 'print $1 if(/^(\w+)-(\d+)/i)'`
 if [ "$time" = "live" ]; then
 	time_param=""
 	isLive="live"
-	DUMP_FILE="-"
 	DISP_MODE="/dev/null"
+	if [ "$PROG_MODE" = "hls" ]; then
+		DUMP_FILE="pipe:1"
+	else
+		DUMP_FILE="-"
+	fi
 else
-	time_param="-B $time"
+	if [ "$PROG_MODE" = "hls" ]; then
+
+		duration=`$COMMON_PATH/getDuration $time`
+		time_param="-t $duration"
+	else
+		time_param="-B $time"
+	fi
 	isLive="rec"
 fi
 
@@ -102,11 +111,15 @@ rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
 ##########################################################
 # radiko.jp get Stream parameter
 ##########################################################
+if [ "$PROG_MODE" = "hls" ]; then
+playlist=`$RADIKO_COMMON/getStreamParam $channel`
+else
 TEXT=`$RADIKO_COMMON/getStreamParam $channel`
 set -- $TEXT
 SERVER=$1
 APPLICATION=$2
 PLAYPATH=$3
+fi
 
 ##########################################################
 # rtmpdump
@@ -114,8 +127,17 @@ PLAYPATH=$3
 MESSAGE="$FILE_NAME:$channel $isLive do"
 echo $MESSAGE 1>&2
 #$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
-rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:$authtoken $time_param --timeout 3600 --live --flv $DUMP_FILE 2> $DISP_MODE
-RTMPDUMP_STATUS=$?
+if [ "$PROG_MODE" = "hls" ]; then
+	if [ "$isLive" = "live" ]; then
+	ffmpeg -headers "X-Radiko-Authtoken: ${authtoken}" -i "${playlist}" -acodec copy -vn -f adts $DUMP_FILE
+	else
+	ffmpeg -headers "X-Radiko-Authtoken: ${authtoken}" -i "${playlist}" -acodec copy -vn -t $duration -f adts $DUMP_FILE
+	fi
+	RTMPDUMP_STATUS=$?
+else
+	rtmpdump -v -r "$SERVER" --playpath "$PLAYPATH" --app "$APPLICATION" -W $playerurl -C S:"" -C S:"" -C S:"" -C S:$authtoken $time_param --timeout 3600 --live --flv $DUMP_FILE 2> $DISP_MODE
+	RTMPDUMP_STATUS=$?
+fi
 
 if [ "$isLive" = "live" ]; then
 	RTMPDUMP_STATUS=$((RTMPDUMP_STATUS - 1))

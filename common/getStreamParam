@@ -21,6 +21,7 @@ my $prog_path = "$home_path";
 $home_path =~ s/__FILE__//g;
 
 $cfg = new Config::Simple("$home_path/radiko.ini")->vars();
+my $prog_mode = $cfg->{'common.prog_mode'};
 my $rtmp_pattern = $cfg->{'common.rtmp_pattern'};
 my $timeout = $cfg->{'common.http_timeout'};
 my $user_agent = `$prog_path/common/makeUserAgent radiko.jp $cfg->{'common.player_ver'}`;
@@ -29,17 +30,27 @@ $ua = LWP::UserAgent->new;
 $ua->timeout($timeout);
 $ua->agent($user_agent);
 
-$res = $ua->get("http://radiko.jp/v2/station/stream_multi/$station_id.xml");
-if (!$res->is_success) {
-	print "Station is not Found.\n";
-	exit 1;
+if($prog_mode ne "hls"){
+	$res = $ua->get("http://radiko.jp/v2/station/stream_multi/$station_id.xml");
+	if (!$res->is_success) {
+		print "Station is not Found.\n";
+		exit 1;
+	}
+
+	my $stream_url = XML::Simple->new(keyattr => [])->XMLin($res->content)->{"item"}[0]->{"content"};
+	# rtmpe://w-radiko.smartstream.ne.jp/FMJ/_definst_/simul-stream.stream
+
+	my ($blank, $protocol, $server, $application, $playpath) = split($rtmp_pattern, $stream_url);
+	print "$protocol://$server,$application,$playpath\n";
+} else {
+	$res = $ua->get("http://radiko.jp/v2/station/stream_smh_multi/$station_id.xml");
+	if (!$res->is_success) {
+		print "Station is not Found.\n";
+		exit 1;
+	}
+	my $stream_url = XML::Simple->new(keyattr => [])->XMLin($res->content)->{"url"}[0]->{"playlist_create_url"};
+	print "$stream_url\n";
 }
-
-my $stream_url = XML::Simple->new(keyattr => [])->XMLin($res->content)->{"item"}[0]->{"content"};
-# rtmpe://w-radiko.smartstream.ne.jp/FMJ/_definst_/simul-stream.stream
-
-my ($blank, $protocol, $server, $application, $playpath) = split($rtmp_pattern, $stream_url);
-print "$protocol://$server,$application,$playpath\n";
 
 exit 0;
 
