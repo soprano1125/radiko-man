@@ -1,0 +1,24 @@
+#!/usr/bin/perl --
+
+use strict;
+
+my($d, $t);
+my($h, $m, $s);
+
+if(@ARGV ne 1){
+	print "usage: " . __FILE__ . " duration\n";
+	exit 1;
+}
+
+$d = $ARGV[0];
+if($d !~ /^\d+$/){
+	print "usage: " . __FILE__ . " duration\n";
+	exit 1;
+}
+
+$s = $d % 60;  $t = int($d/60);
+$m = $t % 60;  $t = int($t/60);
+$h = $t % 24;
+
+printf("%02d:%02d:%02d\n", $h, $m, $s);
+

@@ -1,0 +1,52 @@
+#!/usr/bin/perl --
+
+use strict;
+use Config::Simple;
+use File::Spec;
+use LWP::UserAgent;
+
+my ($res, $ua, $cfg);
+
+my $home_path = File::Spec->rel2abs();
+my $prog_path = "$home_path";
+my $temp_path = "share/temp";
+$home_path =~ s/__FILE__//g;
+
+$cfg = new Config::Simple("$home_path/radiko.ini")->vars();
+
+my $cookie_file = "$home_path/$temp_path/" . $cfg->{'premium.cookie_file'};
+my $auth_key = "$home_path/$temp_path/" . $cfg->{'premium.auth_key'};
+
+my $url = $cfg->{'premium.auth_url'};
+my $auth_user = $cfg->{'premium.auth_mail'};
+my $auth_pass = $cfg->{'premium.auth_pass'};
+my $timeout = $cfg->{'common.http_timeout'};
+my $user_agent = `$prog_path/common/makeUserAgent radiko.jp $cfg->{'common.player_ver'}`;
+
+$ua = LWP::UserAgent->new;
+$ua->timeout($timeout);
+$ua->agent($user_agent);
+$ua->cookie_jar({file => $cookie_file, autosave => 1});
+
+$res = $ua->post($url . '/login/login', {"mail" => $auth_user, "pass" => $auth_pass});
+if ($res->is_error) {
+	print "failed login.:[$auth_user][login/check]";
+	exit 1;
+}
+
+$res = $ua->get($url . '/webapi/member/login/check');
+if ($res->is_error) {
+	print "failed login.:[$auth_user][login/check]";
+	exit 1;
+}
+
+my $JSON = $res->content;
+$JSON =~ s/{(.*)}/$1/g;
+
+my ($message, $ret);
+$message = `$prog_path/common/checkPaidMember \'$JSON\'`;
+$ret = $?;
+
+print "$message.:[$auth_user]";
+exit "$ret";
+

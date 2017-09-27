@@ -1,0 +1,94 @@
+#!/usr/bin/perl --
+
+use strict;
+use Config::Simple;
+use File::Spec;
+use LWP::UserAgent;
+use XML::Simple;
+use Encode;
+
+if (@ARGV != 2){
+	print "usage: " . __FILE__ . " station_id isPremium<0,1>\n";
+	exit 1;
+}
+
+###############################################
+# set Module
+###############################################
+my ($ua, $res, $cfg);
+
+###############################################
+# set Value
+###############################################
+my $home_path = File::Spec->rel2abs();
+my $prog_path = "$home_path";
+my $temp_path = "share/temp";
+$home_path =~ s/__FILE__//g;
+
+$cfg = new Config::Simple("$home_path/radiko.ini")->vars();
+
+my $api_url = $cfg->{'common.api_url'};
+my $timeout = $cfg->{'common.http_timeout'};
+my $user_agent = `$prog_path/common/makeUserAgent radiko.jp $cfg->{'common.player_ver'}`;
+
+my $cookie_file = "$home_path/$temp_path/" . $cfg->{'premium.cookie_file'};
+my $auth_key = "$home_path/$temp_path/" . $cfg->{'premium.auth_key'};
+my $area_file = "$home_path/$temp_path/" . $cfg->{'common.area_file'};
+
+my $station_id = $ARGV[0];
+my $isPremium = $ARGV[1];
+
+my ($status, $ret, $area_id, $area_name, $message);
+
+open(IN, "$auth_key");
+my $radiko_keys = <IN>;
+close(IN);
+
+my ($authtoken, $partialkey, $paid_member) = split(/,/, $radiko_keys);
+$paid_member =~ s/\n//g;
+#print "check: $paid_member, $isPremium => " . (($paid_member == 3) && $isPremium) . "\n";
+
+if (($paid_member == 3) && !$isPremium) {
+	##################################
+	# Premium 
+	##################################
+	$ua = LWP::UserAgent->new;
+	$ua->timeout($timeout);
+	$ua->agent($user_agent);
+	if (-f $cookie_file) {
+		$ua->cookie_jar({file => "$cookie_file", autosave => 1});
+	}
+
+	$area_id = "premium";
+	$area_name = $area_id;
+
+	$res = $ua->get($api_url . '/program/station/today?station_id=' . $station_id);
+	if ($res->is_success) {
+		$status = "Station is Found.";
+		$ret = 0;
+	} else {
+		$status = "Station is not Found.";
+		$ret = 1;
+	}
+	$message = "$area_name|$status($area_id)";
+
+} else {
+	##################################
+	# not Premium 
+	##################################
+	open(IN, "$area_file");
+	$area_id = <IN>;
+	close(IN);
+	unlink("$area_file");
+	$area_id =~ s/^([^,]+),([^,]+),([^,]+)$/$1/g;
+
+	$message = `$prog_path/common/checkIPArea $area_id $station_id`;
+	$ret = $?;
+	if ($ret) {
+		$ret = 1;
+	}
+}
+
+print "$message";
+exit "$ret";
+
