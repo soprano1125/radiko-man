@@ -4,6 +4,8 @@ use strict;
 use Config::Simple;
 use File::Spec;
 use LWP::UserAgent;
+use MIME::Base64;
+
 
 if (@ARGV != 1){
 	print "usage: " . __FILE__ . " APP_VERSION\n";
@@ -95,7 +97,12 @@ my ($authtoken, $offset, $length, $partialkey);
 $authtoken = $res->header("x-radiko-authtoken");
 $offset = $res->header("x-radiko-keyoffset");
 $length = $res->header("x-radiko-keylength");
-$partialkey = `dd if=$keyfile bs=1 skip=$offset count=$length 2> /dev/null | base64`;
+
+open(IN, $keyfile) || die "can't open $keyfile";
+seek(IN, $offset, 0);
+read(IN, my $data, $length);
+$partialkey = encode_base64($data);
+close(IN);
 $partialkey =~ s/\n//g;
 
 ##################################
