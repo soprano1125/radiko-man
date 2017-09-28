@@ -34,4 +34,6 @@ RET_MESSAGE=`perldoc -m XML::Simple 2>&1 > /dev/null`
 if [ $? -eq 1 ]; then echo "Not install 'XML::Simple' module."; fi
 RET_MESSAGE=`perldoc -m Unicode::Japanese 2>&1 > /dev/null`
 if [ $? -eq 1 ]; then echo "Not install 'Unicode::Japanese' module."; fi
+RET_MESSAGE=`perldoc -m MIME::Base64 2>&1 > /dev/null`
+if [ $? -eq 1 ]; then echo "Not install 'MIME::Base64' module."; fi
 
