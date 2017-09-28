@@ -72,7 +72,7 @@ $ ./radiko_live.sh channel_name [premium_mode<free,premium>]
 ## 引数の解説
 + radiko_mp3.sh, radiko_noenc.sh, radiko_live.sh
    + `channel_name` : 録音する放送局の ID
-   + `rec_time` : 録音時間(秒)　radiko_live.sh　で使うことはまぁないでしょう
+   + `rec_time` : 録音時間(秒) radiko_live.sh で使うことはまぁないでしょう
    + `premium_mode` : プレミアム会員で録音する場合は premium, そうでない場合は free
    + `outputfile` : (あれば)番組名
 + radiko.ini
@@ -87,7 +87,7 @@ $ ./radiko_live.sh channel_name [premium_mode<free,premium>]
        + `prog_mode`: プログラムモード指定 shell の場合は sh, Perl の場合は pl, hls の場合は hls
        + `player_ver`: player.swf のバージョンナンバー
        + `player_url`: player.swf のURL
-       + `playerJS_url`: key
+       + `playerJS_url`: partialkey 生成用
        + `server`: rtmp サーバーのアドレス
        + `play_path`: playpath
        + `application`: rtmp サーバーのアドレス
@@ -111,7 +111,7 @@ $ ./radiko_live.sh channel_name [premium_mode<free,premium>]
       * 足りてるねぇ→その時は周りも(このリポジトリの人も)聴けてないと思います。慌てず騒がず対応を待ったりググったりしてください。
 * Windows でもできる?
    * 基本的に Bash と Perl が動けば多分いけるんじゃないですか?(未確認)
-   * というか誰かが Windows　バイナリで作ったらいいんじゃ(素
+   * というか誰かが Windows バイナリで作ったらいいんじゃ(素
 * タイムシフト(タイムフリー)の機能はないの?
    * 一応準備はしていますがまだ「実証実験」なので入れていません。
    * と言っても認証方法は rtmp, hls の方法と同じみたいなので誰かが(ry
