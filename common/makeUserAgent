@@ -17,11 +17,10 @@ my $stream_site = $ARGV[0];
 my $player_version = $ARGV[1];
 
 my $home_path = File::Spec->rel2abs();
-my $script_name = __FILE__;
 $home_path =~ s/__FILE__//g;
-$script_name =~ s/$home_path//g;
+my $prog_path = "$home_path";
 
-$cfg = new Config::Simple("$home_path/radiko.ini")->vars();
+$cfg = new Config::Simple("$prog_path/radiko.ini")->vars();
 my $user_agent = sprintf("%s (%s) %s/%s\n", $cfg->{'common.mozilla_agent'}, $cfg->{'common.user_agent'}, $stream_site, $player_version);
 #print STDERR "$user_agent";
 print $user_agent;

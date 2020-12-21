@@ -3,9 +3,9 @@
 use strict;
 use Config::Simple;
 use File::Spec;
+use File::Path;
 use LWP::UserAgent;
 use MIME::Base64;
-
 
 if (@ARGV != 1){
 	print "usage: " . __FILE__ . " APP_VERSION\n";
@@ -23,23 +23,28 @@ my ($ua, $res, $cfg);
 my $APP_VERSION = $ARGV[0];
 
 my $home_path = File::Spec->rel2abs();
-my $prog_path = "$home_path";
-my $temp_path = "share/temp";
 $home_path =~ s/__FILE__//g;
+my $prog_path = "$home_path";
 
-$cfg = new Config::Simple("$home_path/radiko.ini")->vars();
+$cfg = new Config::Simple("$prog_path/radiko.ini")->vars();
+
+my $temp_path = "share/temp";
+my $cookie_file = "$home_path/$temp_path/". $cfg->{'premium.cookie_file'};
+my $auth_key = "$home_path/$temp_path/". $cfg->{'premium.auth_key'};
+my $user_status = "$home_path/$temp_path/". $cfg->{'premium.user_status'};
+my $area_file = "$home_path/$temp_path/". $cfg->{'common.area_file'};
+my $ifs = $cfg->{'common.ifs'};
 
 my $api_url = $cfg->{'common.api_url'};
 my $timeout = $cfg->{'common.http_timeout'};
 my $user_agent = `$prog_path/common/makeUserAgent radiko.jp $cfg->{'common.player_ver'}`;
 
-my $cookie_file = "$home_path/$temp_path/" . $cfg->{'premium.cookie_file'};
-my $auth_key = "$home_path/$temp_path/" . $cfg->{'premium.auth_key'};
-my $area_file = "$home_path/$temp_path/" . $cfg->{'common.area_file'};
-my $playerJS_url = $cfg->{'common.playerJS_url'};
+my $player_url = $cfg->{'common.playerJS_url'};
 my $keyfile = "$home_path/$temp_path/authkey.bin";
 
 my $ERROR;
+
+mkpath("$home_path/$temp_path");
 
 ###############################################
 # init LWP 
@@ -52,15 +57,21 @@ if (-f $cookie_file) {
 $ua->timeout($timeout);
 $ua->agent($user_agent);
 $ua->default_header("pragma"               => "no-cache");
+$ua->default_header("X-Radiko-App-Version" => "$APP_VERSION");
+$ua->default_header("X-Radiko-User"        => "test-stream");
+$ua->default_header("X-Radiko-Device"      => "pc");
 
 ###############################################
 # get Player
 ###############################################
-#my $player_url = "http://radiko.jp/player/swf/player_$APP_VERSION.swf";
-$res = $ua->get($playerJS_url);
+$res = $ua->get($player_url);
 if (!$res->is_success) {
-	$ERROR = "failed getPlater process.";
-	print "$ERROR";
+	print STDERR $player_url . "\n*******************************\n";
+	print STDERR $res->headers->as_string . "\n*******************************\n";
+	print STDERR $res->content . "\n*******************************\n";
+
+	$ERROR = "failed getPlayer process.";
+	print "$ERROR\n";
 	exit 1;
 }
 
@@ -69,27 +80,28 @@ if (!$res->is_success) {
 ###############################################
 my $lwp_ = $res->content;
 if ($lwp_ !~ /new RadikoJSPlayer\(\$audio\[\d+\], '(\w+)', '(\w+)'/){
-	print "not found key data.\n";
-	exit;
+	$ERROR = "failed get keydata[RadikoJSPlayer].";
+	print "$ERROR";
+	exit 1;
 }
-
-$ua->default_header("X-Radiko-App"         => $1);
-$ua->default_header("X-Radiko-App-Version" => "$APP_VERSION");
-$ua->default_header("X-Radiko-User"        => "dummy_user");
-$ua->default_header("X-Radiko-Device"      => "pc");
 
 open(OUT, "> $keyfile");
 print(OUT $2);
 close(OUT);
 
+$ua->default_header("X-Radiko-App"         => $1);
 
 ###############################################
 # get Token
 ###############################################
-$res = $ua->get($api_url . '/auth1');
+$res = $ua->post($api_url . '/auth1_fms', {"" => '\r\n'});
 if (!$res->is_success) {
+	print STDERR $api_url . '/auth1_fms' . "\n*******************************\n";
+	print STDERR $res->headers->as_string . "\n*******************************\n";
+	print STDERR $res->content . "\n*******************************\n";
+
 	$ERROR = "failed auth1 process.";
-	print "$ERROR";
+	print "$ERROR\n";
 	exit 1;
 }
 
@@ -98,11 +110,11 @@ $authtoken = $res->header("x-radiko-authtoken");
 $offset = $res->header("x-radiko-keyoffset");
 $length = $res->header("x-radiko-keylength");
 
-open(IN, $keyfile) || die "can't open $keyfile";
-seek(IN, $offset, 0);
-read(IN, my $data, $length);
-$partialkey = encode_base64($data);
-close(IN);
+open(my $fh, $keyfile) || die "can't open $keyfile";
+seek($fh, $offset, 0);
+read($fh, my $binary_data, $length);
+$partialkey = encode_base64($binary_data);
+close($fh);
 $partialkey =~ s/\n//g;
 
 ##################################
@@ -110,15 +122,20 @@ $partialkey =~ s/\n//g;
 ##################################
 $ua->default_header("X-Radiko-Authtoken"   => "$authtoken");
 $ua->default_header("X-Radiko-Partialkey"  => "$partialkey");
-$res = $ua->get($api_url . '/auth2');
+$res = $ua->post($api_url . '/auth2_fms', {"" => '\r\n'});
 if (!$res->is_success) {
+	print STDERR $api_url . '/auth2_fms' . "\n*******************************\n";
+	print STDERR $res->headers->as_string . "\n*******************************\n";
+	print STDERR $res->content . "\n*******************************\n";
+
 	$ERROR = "failed auth2 process.";
-	print "$ERROR";
+	print "$ERROR\n";
 	exit 1;
 }
 
 for my $line(split(/\n/, $res->content)) {
 	if($line =~ /([^,]+),([^,]+),([^,]+)/){
+		$line =~ s/\r//;
 		open(OUT, "> $area_file");
 		print(OUT $line);
 		close(OUT);
@@ -129,14 +146,18 @@ for my $line(split(/\n/, $res->content)) {
 ###############################################
 # save Token
 ###############################################
-open(IN, "$auth_key");
+open(IN, "$user_status");
 my $auth_status = <IN>;
+$auth_status =~ s/\s+//;
+$auth_status =~ s/\r//;
+$auth_status =~ s/\n//;
 close(IN);
+
 open(OUT, "> $auth_key");
-print(OUT "$authtoken,$partialkey,$auth_status");
+print(OUT "$authtoken$ifs$partialkey$ifs$auth_status");
 close(OUT);
 
-unlink($keyfile);
+unlink($keyfile, $user_status);
 
 print "authentication success.";
 exit 0;

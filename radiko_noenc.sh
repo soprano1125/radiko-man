@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/bash
 
 
 if [ $# -eq 3 ]; then
@@ -25,7 +25,7 @@ OUT_DIR=$HOME_PATH/share/$channel
 OUT_FILE=$OUT_DIR/$FILENAME.flv
 FILE_OWNER=`$COMMON_PATH/getParam common owner`
 
-mkdir -p $TEMP_PATH $PROG_PATH/log/ $OUT_DIR
+sudo mkdir -p $OUT_DIR $TEMP_PATH $PROG_PATH/logs/
 $PROG_PATH/radiko_download.sh $channel $time $flgPremium $TEMP_PATH/$FILENAME.flv
 if [ $? -ne 0 ]; then
 	exit 1;

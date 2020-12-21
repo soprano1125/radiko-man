@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/bash
 
 
 if [ $# -eq 4 ]; then
@@ -18,12 +18,12 @@ cd $PROG_PATH
 PROG_MODE=`$COMMON_PATH/getParam common prog_mode`
 MODULE_PATH="$PROG_PATH/$PROG_MODE"
 
-APP_VERSION=`$COMMON_PATH/getParam common player_ver`
-playerurl=`$COMMON_PATH/getParam common player_url`
-
 AUTH_KEY="$TEMP_PATH/`$COMMON_PATH/getParam premium auth_key`"
 COOKIE_FILE="$TEMP_PATH/`$COMMON_PATH/getParam premium cookie_file`"
 AREA_FILE="$TEMP_PATH/`$COMMON_PATH/getParam common area_file`"
+
+APP_VERSION=`$COMMON_PATH/getParam common player_ver`
+playerurl=`$COMMON_PATH/getParam common player_url`
 
 FILE_NAME=`echo $DUMP_FILE | sed -e "s|$TEMP_PATH\/||g"`
 
@@ -39,7 +39,6 @@ if [ "$time" = "live" ]; then
 	fi
 else
 	if [ "$PROG_MODE" = "hls" ]; then
-
 		duration=`$COMMON_PATH/getDuration $time`
 		time_param="-t $duration"
 	else
@@ -97,28 +96,26 @@ if [ $isPremiumRet -ne 1 ]; then
 	echo $MESSAGE 1>&2
 fi
 
-IFS=','
 
 ##########################################################
 # radiko.jp get Authkey 
 ##########################################################
-TEXT=`cat $AUTH_KEY`
-set -- $TEXT
-authtoken=$1
-echo $authtoken 1>&2
-rm -rf $AUTH_KEY $COOKIE_FILE $AREA_FILE
+IFS=`$COMMON_PATH/getParam common ifs`
+authtoken=`cat $AUTH_KEY | sed -e "s/$IFS.*$//"`
+echo "token:$authtoken" 1>&2
 
 ##########################################################
 # radiko.jp get Stream parameter
 ##########################################################
 if [ "$PROG_MODE" = "hls" ]; then
-playlist=`$RADIKO_COMMON/getStreamParam $channel`
+	playlist=`$RADIKO_COMMON/getStreamParam $channel`
 else
-TEXT=`$RADIKO_COMMON/getStreamParam $channel`
-set -- $TEXT
-SERVER=$1
-APPLICATION=$2
-PLAYPATH=$3
+	IFS=','
+	TEXT=`$RADIKO_COMMON/getStreamParam $channel`
+	set -- $TEXT
+	SERVER=$1
+	APPLICATION=$2
+	PLAYPATH=$3
 fi
 
 ##########################################################
@@ -126,7 +123,10 @@ fi
 ##########################################################
 MESSAGE="$FILE_NAME:$channel $isLive do"
 echo $MESSAGE 1>&2
-#$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
+if [ "$isLive" != "live" ]; then
+#	$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
+fi
+
 if [ "$PROG_MODE" = "hls" ]; then
 	if [ "$isLive" = "live" ]; then
 	ffmpeg -headers "X-Radiko-Authtoken: ${authtoken}" -i "${playlist}" -acodec copy -vn -f adts $DUMP_FILE
@@ -149,7 +149,9 @@ else
 	MESSAGE="$FILE_NAME:$channel $isLive done"
 fi
 
-#$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
+if [ "$isLive" != "live" ]; then
+#	$HOME_PATH/twitter/post.sh "$MESSAGE" > /dev/null
+fi
 echo $MESSAGE 1>&2
 exit $RTMPDUMP_STATUS
 

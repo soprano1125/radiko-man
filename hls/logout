@@ -4,16 +4,17 @@ use strict;
 use Config::Simple;
 use File::Spec;
 use LWP::UserAgent;
+use HTTP::Cookies;
 
-my ($ua, $cfg);
+my ($ua, $cookie, $cfg);
 
 my $home_path = File::Spec->rel2abs();
-my $prog_path = "$home_path";
-my $temp_path = "share/temp";
 $home_path =~ s/__FILE__//g;
+my $prog_path = "$home_path";
 
-$cfg = new Config::Simple("$home_path/radiko.ini")->vars();
+$cfg = new Config::Simple("$prog_path/radiko.ini")->vars();
 
+my $temp_path = "share/temp";
 my $cookie_file = "$home_path/$temp_path/" . $cfg->{'premium.cookie_file'};
 my $auth_key = "$home_path/$temp_path/" . $cfg->{'premium.auth_key'};
 
@@ -24,6 +25,7 @@ my $user_agent = `$prog_path/common/makeUserAgent radiko.jp $cfg->{'common.playe
 $ua = LWP::UserAgent->new;
 $ua->timeout($timeout);
 $ua->agent($user_agent);
+$cookie = HTTP::Cookies->new(file => $cookie_file, autosave => 1);
 $ua->cookie_jar({file => $cookie_file, autosave => 1});
 
 $ua->get($url . '/webapi/member/logout');

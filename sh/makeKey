@@ -95,9 +95,7 @@ paid_member=0
 if [ -f $AUTH_KEY ]; then
 	paid_member=`cat $AUTH_KEY`
 fi
-echo $authtoken,$partialkey,$paid_member > $AUTH_KEY
-#echo "AUTH_KEY: `cat $AUTH_KEY`"
-#echo -e "authtoken: $authtoken \noffset: $offset \nlength: $length \npartialkey: $partialkey"
+echo $authtoken<|TAB|>$partialkey<|TAB|>$paid_member > $AUTH_KEY
 rm -f $auth1_fms
 
 #################################

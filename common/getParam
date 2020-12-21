@@ -12,14 +12,15 @@ if (@ARGV != 2){
 
 my ($res, $ua, $cfg);
 
-my $home_path = File::Spec->rel2abs();
-$home_path =~ s/__FILE__//g;
 
 my $section = $ARGV[0];
 my $param_name = $ARGV[1];
 
+my $home_path = File::Spec->rel2abs();
+$home_path =~ s/__FILE__//g;
+my $prog_path = "$home_path";
 
-$cfg = new Config::Simple($home_path . '/radiko.ini')->vars();
+$cfg = new Config::Simple("$prog_path/radiko.ini")->vars();
 
 print $cfg->{$section . '.' . $param_name} . "\n";
 exit 0;

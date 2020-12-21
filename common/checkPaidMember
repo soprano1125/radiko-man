@@ -10,13 +10,16 @@ if (@ARGV != 1){
 	exit 1;
 }
 
-my $home_path = File::Spec->rel2abs();
-$home_path =~ s/__FILE__//g;
-
 my $cfg;
 
-$cfg = new Config::Simple("$home_path/radiko.ini")->vars();
-my $auth_key = $home_path .'/share/temp/'. $cfg->{'premium.auth_key'};
+my $home_path = File::Spec->rel2abs();
+$home_path =~ s/__FILE__//g;
+my $prog_path = "$home_path";
+
+$cfg = new Config::Simple("$prog_path/radiko.ini")->vars();
+
+my $temp_path = "share/temp";
+my $user_status = "$home_path/$temp_path/". $cfg->{'premium.user_status'};
 
 my $JSON = '{' . $ARGV[0] . '}';
 my $item = JSON->new()->decode($JSON);
@@ -40,7 +43,7 @@ if ($status == 200) {
 	$ret = 1;
 }
 
-open(OUT, "> $auth_key");
+open(OUT, "> $user_status");
 print(OUT "$auth_status\n");
 close(OUT);
 
