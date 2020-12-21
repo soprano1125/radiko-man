@@ -95,7 +95,8 @@ paid_member=0
 if [ -f $AUTH_KEY ]; then
 	paid_member=`cat $AUTH_KEY`
 fi
-echo $authtoken<|TAB|>$partialkey<|TAB|>$paid_member > $AUTH_KEY
+IFS=`$COMMON_PATH/getParam common ifs`
+echo $authtoken$IFS$partialkey$IFS$paid_member > $AUTH_KEY
 rm -f $auth1_fms
 
 #################################
@@ -129,7 +130,7 @@ fi
 # get AreaID
 #################################
 areaid=`perl -ne 'print "$1,$2,$3" if(/([^,]+),([^,]+),([^,]+)/i)' $auth2_fms`
-echo "$areaid" > $AREA_FILE
+echo "$IFS$areaid" > $AREA_FILE
 
 rm -rf $playerfile $keyfile $auth2_fms
 echo -n "authentication success"

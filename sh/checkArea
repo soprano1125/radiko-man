@@ -17,7 +17,8 @@ AUTH_KEY="$TEMP_PATH/`$COMMON_PATH/getParam premium auth_key`"
 COOKIE_FILE="$TEMP_PATH/`$COMMON_PATH/getParam premium cookie_file`"
 AREA_FILE="$TEMP_PATH/`$COMMON_PATH/getParam common area_file`"
 
-TEXT=`cat $AUTH_KEY`; IFS=','
+IFS=`$COMMON_PATH/getParam common ifs`
+TEXT=`cat $AUTH_KEY`
 set -- $TEXT
 authtoken=$1
 partialkey=$2
